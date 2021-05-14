@@ -1,0 +1,449 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: test@test.com
+  description: This is the API for Creating, Managing and Fetching Polls and Votes
+    for the RCV Project.
+  title: Ranked Choice Voting API
+  version: 1.0.0
+servers:
+- url: /
+tags:
+- description: Operations for a poll
+  name: Polls
+- description: Operations for individual votes
+  name: Votes
+paths:
+  /poll:
+    post:
+      operationId: createPoll
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PollDetails'
+        description: New Poll Details
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+          description: Success
+        "400":
+          content: {}
+          description: Invalid Poll supplied
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+          description: Unauthorized
+        "404":
+          content: {}
+          description: Poll not found
+      security:
+      - rcvBearerAuth: []
+      summary: Creates a new Poll
+      tags:
+      - Polls
+  /poll/{pollID}:
+    delete:
+      operationId: deletePoll
+      parameters:
+      - description: Poll ID to interact with
+        explode: false
+        in: path
+        name: pollID
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+          description: Success
+        "400":
+          content: {}
+          description: Invalid PollID supplied
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+          description: Unauthorized
+        "404":
+          content: {}
+          description: Poll not found
+      security:
+      - rcvBearerAuth: []
+      summary: Deletes an existing Poll
+      tags:
+      - Polls
+    get:
+      operationId: getPoll
+      parameters:
+      - description: Poll ID to interact with
+        explode: false
+        in: path
+        name: pollID
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+          description: Success
+        "400":
+          content: {}
+          description: Invalid PollID supplied
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+          description: Unauthorized
+        "404":
+          content: {}
+          description: Poll not found
+      security:
+      - rcvBearerAuth: []
+      summary: Gets a specific Poll by its ID
+      tags:
+      - Polls
+    patch:
+      operationId: updatePoll
+      parameters:
+      - description: Poll ID to interact with
+        explode: false
+        in: path
+        name: pollID
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PollDetails'
+        description: Updated Poll Details
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+          description: Success
+        "400":
+          content: {}
+          description: Invalid Poll Details supplied
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+          description: Unauthorized
+        "403":
+          content: {}
+          description: Poll Could Not be Updated (Already has a vote?)
+        "404":
+          content: {}
+          description: Poll not found
+      security:
+      - rcvBearerAuth: []
+      summary: Updates an existing Poll
+      tags:
+      - Polls
+  /poll/{pollID}/results:
+    get:
+      operationId: getPollResults
+      parameters:
+      - description: Poll ID to interact with
+        explode: false
+        in: path
+        name: pollID
+        required: true
+        schema:
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollResults'
+          description: Success
+        "400":
+          content: {}
+          description: Invalid PollID supplied
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+          description: Unauthorized
+        "404":
+          content: {}
+          description: Poll not found
+      security:
+      - rcvBearerAuth: []
+      summary: Gets the Results of a specific Poll by its ID
+      tags:
+      - Polls
+  /poll/{pollID}/vote:
+    post:
+      parameters:
+      - description: Poll ID to interact with
+        explode: false
+        in: path
+        name: pollID
+        required: true
+        schema:
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/VoteInput'
+        description: Vote Input Object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+          description: Success
+        "400":
+          content: {}
+          description: Invalid PollID supplied
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError'
+          description: Unauthorized
+        "404":
+          content: {}
+          description: Poll not found
+      security:
+      - rcvBearerAuth: []
+      summary: Cast a vote for a specific Poll
+      tags:
+      - Votes
+components:
+  schemas:
+    Poll:
+      example:
+        candidates:
+        - name: Spiderman
+        - name: Spiderman
+        pollId: 0
+        rankedChoiceCount: 6
+      properties:
+        pollId:
+          format: int64
+          type: integer
+        rankedChoiceCount:
+          format: int32
+          type: integer
+        candidates:
+          items:
+            $ref: '#/components/schemas/Candidate'
+          type: array
+      type: object
+    PollDetails:
+      example:
+        candidates:
+        - name: Spiderman
+        - name: Spiderman
+        endDate: 2021-05-01 12:00:00.0000 -05:00
+        rankedChoiceCount: 0
+        startDate: 2021-04-28 01:45:00.0000 -05:00
+      properties:
+        startDate:
+          example: 2021-04-28 01:45:00.0000 -05:00
+          type: string
+        endDate:
+          example: 2021-05-01 12:00:00.0000 -05:00
+          type: string
+        rankedChoiceCount:
+          format: int32
+          type: integer
+        candidates:
+          items:
+            $ref: '#/components/schemas/Candidate'
+          type: array
+      type: object
+    PollResults:
+      example:
+        winner: Spiderman
+        pollId: 0
+        totalSteps: 1
+        totalEntries: 6
+        steps:
+        - candidates:
+          - name: Spiderman
+            votes:
+            - voteCount: 2
+              choicePosition: 5
+            - voteCount: 2
+              choicePosition: 5
+          - name: Spiderman
+            votes:
+            - voteCount: 2
+              choicePosition: 5
+            - voteCount: 2
+              choicePosition: 5
+          stepId: 5
+        - candidates:
+          - name: Spiderman
+            votes:
+            - voteCount: 2
+              choicePosition: 5
+            - voteCount: 2
+              choicePosition: 5
+          - name: Spiderman
+            votes:
+            - voteCount: 2
+              choicePosition: 5
+            - voteCount: 2
+              choicePosition: 5
+          stepId: 5
+      properties:
+        pollId:
+          format: int64
+          type: integer
+        totalEntries:
+          format: int32
+          type: integer
+        totalSteps:
+          format: int32
+          type: integer
+        winner:
+          example: Spiderman
+          type: string
+        steps:
+          items:
+            $ref: '#/components/schemas/ResultStep'
+          type: array
+      type: object
+    ResultStep:
+      example:
+        candidates:
+        - name: Spiderman
+          votes:
+          - voteCount: 2
+            choicePosition: 5
+          - voteCount: 2
+            choicePosition: 5
+        - name: Spiderman
+          votes:
+          - voteCount: 2
+            choicePosition: 5
+          - voteCount: 2
+            choicePosition: 5
+        stepId: 5
+      properties:
+        stepId:
+          format: int64
+          type: integer
+        candidates:
+          items:
+            $ref: '#/components/schemas/CandidateResults'
+          type: array
+      type: object
+    Candidate:
+      example:
+        name: Spiderman
+      properties:
+        name:
+          example: Spiderman
+          type: string
+      type: object
+    CandidateResults:
+      example:
+        name: Spiderman
+        votes:
+        - voteCount: 2
+          choicePosition: 5
+        - voteCount: 2
+          choicePosition: 5
+      properties:
+        name:
+          example: Spiderman
+          type: string
+        votes:
+          items:
+            $ref: '#/components/schemas/VoteCount'
+          type: array
+      type: object
+    VoteCount:
+      example:
+        voteCount: 2
+        choicePosition: 5
+      properties:
+        choicePosition:
+          format: int32
+          type: integer
+        voteCount:
+          format: int32
+          type: integer
+      type: object
+    VoteInput:
+      example:
+        choices:
+        - candidate:
+            name: Spiderman
+          choicePosition: 0
+        - candidate:
+            name: Spiderman
+          choicePosition: 0
+      properties:
+        choices:
+          items:
+            $ref: '#/components/schemas/Vote'
+          type: array
+      type: object
+    Vote:
+      example:
+        candidate:
+          name: Spiderman
+        choicePosition: 0
+      properties:
+        choicePosition:
+          format: int32
+          type: integer
+        candidate:
+          $ref: '#/components/schemas/CandidateVote'
+      type: object
+    CandidateVote:
+      example:
+        name: Spiderman
+      properties:
+        name:
+          example: Spiderman
+          type: string
+      type: object
+    UnauthorizedError:
+      properties:
+        description:
+          example: Not Authorized
+          type: string
+      type: object
+  securitySchemes:
+    rcvBearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
