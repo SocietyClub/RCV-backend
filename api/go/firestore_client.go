@@ -9,7 +9,7 @@ import (
 
 func CreateFirestoreClient(ctx context.Context) *firestore.Client {
 	// Sets your Google Cloud Platform project ID.
-	projectID := "societyclub_rcb_backend"
+	projectID := "societyclub-rcv-backend"
 
 	client, err := firestore.NewClient(ctx, projectID)
 	if err != nil {
