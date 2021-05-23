@@ -107,7 +107,7 @@ func (s *PollsApiService) GetPollResults(ctx context.Context, pollID int32) (Imp
 	// EXAMPLE!!
 	// TODO: Remove when actual implementation happens?
 	cntx := context.Background()
-	client := CreateFirestoreClient()
+	client := CreateFirestoreClient(cntx)
 	iter := client.Collection("binams-test-collection").Documents(ctx)
 
 	all_stuff := "This is gathered from firestore binams-test-collection:\n"
