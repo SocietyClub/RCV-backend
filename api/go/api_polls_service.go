@@ -12,12 +12,12 @@ package openapi
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"net/http"
 )
 
 // PollsApiService is a service that implents the logic for the PollsApiServicer
-// This service should implement the business logic for every endpoint for the PollsApi API. 
+// This service should implement the business logic for every endpoint for the PollsApi API.
 // Include any external packages or services that will be required by this service.
 type PollsApiService struct {
 }
@@ -104,7 +104,26 @@ func (s *PollsApiService) GetPollResults(ctx context.Context, pollID int32) (Imp
 	//TODO: Uncomment the next line to return response Response(404, {}) or use other options such as http.Ok ...
 	//return Response(404, nil),nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetPollResults method not implemented")
+	// EXAMPLE!!
+	// TODO: Remove when actual implementation happens?
+	cntx := context.Background()
+	client := CreateFirestoreClient()
+	iter := client.Collection("binams-test-collection").Documents(ctx)
+
+	all_stuff := "This is gathered from firestore binams-test-collection:\n"
+
+	for {
+		doc, err := iter.Next()
+		if err == iterator.Done {
+			break
+		}
+		if err != nil {
+			log.Fatalf("Failed to iterate: %v", err)
+		}
+		all_stuff += doc.Data() + "\n"
+	}
+
+	return Response(http.StatusNotImplemented, nil), errors.New(all_stuff)
 }
 
 // UpdatePoll - Updates an existing Poll
@@ -129,4 +148,3 @@ func (s *PollsApiService) UpdatePoll(ctx context.Context, pollID int32, pollDeta
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdatePoll method not implemented")
 }
-
