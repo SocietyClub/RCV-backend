@@ -12,6 +12,7 @@ package openapi
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"log"
 	"net/http"
@@ -123,7 +124,8 @@ func (s *PollsApiService) GetPollResults(ctx context.Context, pollID int32) (Imp
 		if err != nil {
 			log.Fatalf("Failed to iterate: %v", err)
 		}
-		all_stuff += doc.Data() + "\n"
+		data, _ := json.Marshal(doc.Data())
+		all_stuff += string(data) + "\n"
 	}
 
 	return Response(http.StatusNotImplemented, nil), errors.New(all_stuff)
