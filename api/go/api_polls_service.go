@@ -13,7 +13,10 @@ package openapi
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
+
+	"google.golang.org/api/iterator"
 )
 
 // PollsApiService is a service that implents the logic for the PollsApiServicer
