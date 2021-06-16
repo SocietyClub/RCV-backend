@@ -1,13 +1,27 @@
-# About the Project
+# Rank Choice Voting Backend API
 
-The backend for https://github.com/SocietyClub/RCV
+## Table of Contents
+  - [About the Project <a name="about"></a>](#about-the-project-)
+  - [Getting Started <a name="start"></a>](#getting-started-)
+    - [Generate credentials for service account](#generate-credentials-for-service-account)
+  - [How To Run the API <a name="run"></a>](#how-to-run-the-api-)
+      - [Clone the repository](#clone-the-repository)
+      - [Running the API Locally](#running-the-api-locally)
+  - [Other Development Info <a name="other"></a>](#other-development-info-)
+    - [Generating Go from an OpenAPI Spec](#generating-go-from-an-openapi-spec)
+    - [Deployment](#deployment)
+_________________
 
-# Getting Started
 
-Make sure to install Golang beforehand: https://golang.org/dl/
 
-### Generate key for service account
+## About the Project <a name="about"></a>
+The backend for [Ranked Choice Voting](https://github.com/SocietyClub/RCV). 
+For any questions regarding this project contact teamsocietyclub@gmail.com
 
+## Getting Started <a name="start"></a>
+Make sure to install Golang on your local system beforehand: https://golang.org/dl/
+
+### Generate credentials for service account
 1. Log into Google Cloud and head to Service accounts under the IAM & Admin page. https://console.cloud.google.com/iam-admin/serviceaccounts 
 
 ![Service account img](img/RCVSA.png)
@@ -20,17 +34,33 @@ Make sure to install Golang beforehand: https://golang.org/dl/
 
 For more details check out: https://cloud.google.com/firestore/docs/quickstart-servers#go
 
-*Working on script for this soon...*
+## How To Run the API <a name="run"></a>
 
-4. `cd RCV-backend/helloworld`
-5. `go build`
-6. `.\helloworld.exe` if you are using windows
-7. Once your done, `go clean` to remove object files and cached files
+#### Clone the repository
+```shell
+git clone https://github.com/SocietyClub/RCV-backend.git
+cd RCV-backend/api
+go get
+```
 
-# Generating Go from an OpenAPI Spec
+#### Running the API Locally
+1. Copy service accounts credentials that you generated in the previous steps.
+2. Paste credentials in RCV-backend\api\configs\config.yml under credentials inside the string.  
+
+3. Run the following commands
+
+```shell
+cd RCV-backend/api
+go run main.go
+```
+**DO NOT COMMIT PUSH CREDENTIALS, ALWAYS REMOVE THEM AFTER DEPLOYMENT**
+
+## Other Development Info <a name="other"></a>
+
+### Generating Go from an OpenAPI Spec
 See [how-to-use-open-api-generator.md](how-to-use-open-api-generator.md) for details
 
-# Deployment
+### Deployment
 Only package maintainers have access to deploy. These instructions are for them.
 
 Once you are authorized to deploy through gcloud via your google account, you may download gcloud locally (https://cloud.google.com/sdk/docs/quickstart?authuser=5) or use the terminal from the online google console.
@@ -45,5 +75,3 @@ Once you are authorized to deploy through gcloud via your google account, you ma
 4. `cd RCV-backend/helloworld`
 5. `git pull`
 6. `gcloud app deploy`
-
-

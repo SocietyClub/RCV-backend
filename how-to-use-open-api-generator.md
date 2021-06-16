@@ -1,9 +1,11 @@
-# Command
-docs link: https://openapi-generator.tech/
+# Open API Generator Tutorial
+
+## Command
+Documentation: https://openapi-generator.tech/
 
 Run this in your terminal (replace out-open-api-example with your own OpenAPI yaml file)
 
-## Exmaple
+## Example
 
 > Note: the command above assumes your UID is 1000. We pass the UID into the docker run command so it does not create files as root (Dockers default).
 
@@ -17,5 +19,5 @@ docker run --rm \
         -o /local/api/
 ```
 
-# Permissions
+## Permissions
 Since the file is being created by docker, it might have a different user id. You may need to run `sudo chown -R $USER:$USER out-open-api-example`
