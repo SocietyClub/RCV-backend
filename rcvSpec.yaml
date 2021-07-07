@@ -299,6 +299,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ResultStep'
+        yourEntry:
+          type: Vote
+          items:
+            $ref: '#/components/schemas/VoteInput'
 
     ResultStep:
       type: object
