@@ -6,6 +6,13 @@ The backend for https://github.com/SocietyClub/RCV
 
 TODO
 
+# Contributing
+
+## Restful Verb Documentation
+Read this before you make changes to the API!
+
+https://www.restapitutorial.com/lessons/httpmethods.html
+
 # Generating Go from an OpenAPI Spec
 See [how-to-use-open-api-generator.md](how-to-use-open-api-generator.md) for details
 
