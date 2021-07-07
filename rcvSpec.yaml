@@ -13,6 +13,7 @@ tags:
     description: Operations for individual votes
 paths:
   # TODO: Probably need some header info about who the user creating the poll is 
+  # Create Poll is defined by post (Restfull way)
   '/poll':
     post:
       tags:
@@ -82,7 +83,7 @@ paths:
         '404':
           description: Poll not found
           content: {}
-          
+
     patch:
       tags:
         - Polls
@@ -239,13 +240,25 @@ paths:
 
 components:
   schemas:
+    # Why aren't Poll and PollDetails the same?
+    # Poll should have start and end dates
     Poll:
       type: object
       properties:
+        # ADD Poll Creator ID
+        # ADD Missing title
+        # ADD Open For Voting
+        # Enforce timezone in ISO Format (with timezone)
+        startDate:
+          type: string
+          example: '2021-04-28 01:45:00.0000 -05:00'
+        endDate: # This should be optional
+          type: string
+          example: '2021-05-01 12:00:00.0000 -05:00'
         pollId:
           type: integer
           format: int64
-        rankedChoiceCount:
+        maxNumRankedChoiceCount:
           type: integer
           format: int32
         candidates:
@@ -256,13 +269,10 @@ components:
     PollDetails:
       type: object
       properties:
-        startDate:
-          type: string
-          example: '2021-04-28 01:45:00.0000 -05:00'
-        endDate:
-          type: string
-          example: '2021-05-01 12:00:00.0000 -05:00'
-        rankedChoiceCount:
+        # ADD Poll Creator ID
+        # ADD Missing title
+        # ADD Open For Voting
+        maxNumRankedChoiceCount:
           type: integer
           format: int32
         candidates:
