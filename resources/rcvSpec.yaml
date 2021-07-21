@@ -1,0 +1,378 @@
+openapi: 3.0.1
+info:
+  version: 1.0.0
+  title: Ranked Choice Voting API
+  description: >-
+    This is the API for Creating, Managing and Fetching Polls and Votes for the RCV Project.
+  contact:
+    email: teamsocietyclub@gmail.com
+tags:
+  - name: Polls
+    description: Operations for a poll
+  - name: Votes
+    description: Operations for individual votes
+paths:
+  # Create Poll is defined by post (Restfull way)
+  '/poll':
+    post:
+      tags:
+        - Polls
+      summary: Creates a new Poll
+      operationId: createPoll
+      requestBody:
+        description: New Poll Details
+        required: true
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PollDetails'
+      security:
+        - rcvBearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+        '400':
+          description: Invalid Poll supplied
+          content: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError' 
+        '404':
+          description: Poll not found
+          content: {}
+
+  '/poll/{pollID}':
+    get:
+      tags:
+        - Polls
+      summary: Gets a specific Poll by its ID
+      operationId: getPoll
+      parameters:
+        - name: pollID
+          in: path
+          description: Poll ID to interact with
+          required: true
+          schema:
+            type: integer
+      security:
+        - rcvBearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+        '400':
+          description: Invalid PollID supplied
+          content: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError' 
+        '404':
+          description: Poll not found
+          content: {}
+
+    patch:
+      tags:
+        - Polls
+      summary: Updates an existing Poll
+      operationId: updatePoll
+      parameters:
+        - name: pollID
+          in: path
+          description: Poll ID to interact with
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Updated Poll Details
+        required: true
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/PollDetails'
+      security:
+        - rcvBearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+        '400':
+          description: Invalid Poll Details supplied
+          content: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError' 
+        '404':
+          description: Poll not found
+          content: {}
+
+    delete:
+      tags:
+        - Polls
+      summary: Deletes an existing Poll
+      operationId: deletePoll
+      parameters:
+        - name: pollID
+          in: path
+          description: Poll ID to interact with
+          required: true
+          schema:
+            type: integer
+      security:
+        - rcvBearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+        '400':
+          description: Invalid PollID supplied
+          content: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError' 
+        '404':
+          description: Poll not found
+          content: {}
+
+  '/poll/{pollID}/results':
+    get:
+      tags:
+        - Polls
+      summary: Gets the Results of a specific Poll by its ID
+      operationId: getPollResults
+      parameters:
+        - name: pollID
+          in: path
+          description: Poll ID to interact with
+          required: true
+          schema:
+            type: integer
+      security:
+        - rcvBearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollResults'
+        '400':
+          description: Invalid PollID supplied
+          content: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError' 
+        '404':
+          description: Poll not found
+          content: {}
+
+  '/poll/{pollID}/vote':
+    post:
+      tags:
+        - Votes
+      summary: Cast a vote for a specific Poll
+      parameters:
+        - name: pollID
+          in: path
+          description: Poll ID to interact with
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Vote Input Object
+        required: true
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/VoteInput'
+      security:
+        - rcvBearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Poll'
+        '400':
+          description: Invalid PollID supplied
+          content: {}
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnauthorizedError' 
+        '404':
+          description: Poll not found
+          content: {}
+
+components:
+  schemas:
+    # Why aren't Poll and PollDetails the same?
+    # Poll should have start and end dates
+    Poll:
+      type: object
+      properties:
+        # ADD Poll Creator ID (Cookie UUID)
+        # ADD Missing title
+        # ADD Open For Voting
+        # Enforce timezone in ISO Format (with timezone)
+        startDate:
+          type: string
+          example: '2021-04-28 01:45:00.0000 -05:00'
+        endDate: # This should be optional
+          type: string
+          example: '2021-05-01 12:00:00.0000 -05:00'
+        pollId:
+          type: integer
+          format: int64
+        maxNumRankedChoiceCount:
+          type: integer
+          format: int32
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Candidate'
+
+    PollDetails:
+      type: object
+      properties:
+        # ADD Poll Creator ID (Cookie UUID)
+        # ADD Missing title
+        # ADD Open For Voting
+        maxNumRankedChoiceCount:
+          type: integer
+          format: int32
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/Candidate'
+
+    PollResults:
+      type: object
+      properties:
+        pollId:
+          type: integer
+          format: int64
+        totalEntries:
+          type: integer
+          format: int32
+        totalSteps:
+          type: integer
+          format: int32
+        winner:
+          type: string
+          example: Spiderman
+        steps:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResultStep'
+        yourEntry:
+          type: Vote
+          items:
+            $ref: '#/components/schemas/VoteInput'
+
+    ResultStep:
+      type: object
+      properties:
+        stepId:
+          type: integer
+          format: int64
+        candidates:
+          type: array
+          items:
+            $ref: '#/components/schemas/CandidateResults'
+
+    Candidate:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Spiderman
+
+    CandidateResults:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Spiderman
+        votes:
+          type: array
+          items:
+            $ref: '#/components/schemas/VoteCount'
+
+    VoteCount:
+      type: object
+      properties:
+        choicePosition:
+          type: integer
+          format: int32
+        voteCount:
+          type: integer
+          format: int32
+
+    VoteInput:
+      type: object
+      properties:
+        choices:
+          type: array
+          items:
+            $ref: '#/components/schemas/Vote'
+
+    Vote:
+      type: object
+      properties:
+        choicePosition:
+          type: integer
+          format: int32
+        candidate:
+          $ref: '#/components/schemas/CandidateVote'
+
+    CandidateVote:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Spiderman
+
+    UnauthorizedError:
+      type: object
+      properties:
+        description:
+          type: string
+          example: Not Authorized
+  
+  securitySchemes:
+    rcvBearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
