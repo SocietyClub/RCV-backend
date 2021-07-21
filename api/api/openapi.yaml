@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   contact:
-    email: test@test.com
+    email: teamsocietyclub@gmail.com
   description: This is the API for Creating, Managing and Fetching Polls and Votes
     for the RCV Project.
   title: Ranked Choice Voting API
