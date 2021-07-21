@@ -12,7 +12,6 @@ tags:
   - name: Votes
     description: Operations for individual votes
 paths:
-  # TODO: Probably need some header info about who the user creating the poll is 
   # Create Poll is defined by post (Restfull way)
   '/poll':
     post:
@@ -35,7 +34,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Poll' # TODO: Could also create a slim object to be returned here
+                $ref: '#/components/schemas/Poll'
         '400':
           description: Invalid Poll supplied
           content: {}
@@ -111,7 +110,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Poll' # TODO: Could also create a slim object to be returned here
+                $ref: '#/components/schemas/Poll'
         '400':
           description: Invalid Poll Details supplied
           content: {}
@@ -121,9 +120,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UnauthorizedError' 
-        '403':
-          description: Poll Could Not be Updated (Already has a vote?) # TODO: Should updating a poll with a vote be forbidden or just clear the existing votes?
-          content: {}
         '404':
           description: Poll not found
           content: {}
@@ -148,7 +144,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Poll' # TODO: Could also create a slim object to be returned here
+                $ref: '#/components/schemas/Poll'
         '400':
           description: Invalid PollID supplied
           content: {}
@@ -197,7 +193,7 @@ paths:
           description: Poll not found
           content: {}
 
-  '/poll/{pollID}/vote': #TODO: Probably need some header info about who the user placing the vote is
+  '/poll/{pollID}/vote':
     post:
       tags:
         - Votes
@@ -245,7 +241,7 @@ components:
     Poll:
       type: object
       properties:
-        # ADD Poll Creator ID
+        # ADD Poll Creator ID (Cookie UUID)
         # ADD Missing title
         # ADD Open For Voting
         # Enforce timezone in ISO Format (with timezone)
@@ -269,7 +265,7 @@ components:
     PollDetails:
       type: object
       properties:
-        # ADD Poll Creator ID
+        # ADD Poll Creator ID (Cookie UUID)
         # ADD Missing title
         # ADD Open For Voting
         maxNumRankedChoiceCount:
@@ -363,7 +359,7 @@ components:
     CandidateVote:
       type: object
       properties:
-        name: # TODO: Maybe we shouldn't key based off of string name, should we give each candidate a unique ID?
+        name:
           type: string
           example: Spiderman
 
