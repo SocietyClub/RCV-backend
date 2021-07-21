@@ -2,6 +2,8 @@
 
 ## Table of Contents
   - [About the Project <a name="about"></a>](#about-the-project-)
+  - [Contributing <a name="contributing"></a>](#contributing-)
+  - [Restful Verb Documentation <a name="restful-verb-documenation"></a>](#restful-verb-documenation-)
   - [Getting Started <a name="start"></a>](#getting-started-)
     - [Generate credentials for service account](#generate-credentials-for-service-account)
   - [How To Run the API <a name="run"></a>](#how-to-run-the-api-)
@@ -12,11 +14,18 @@
     - [Deployment](#deployment)
 _________________
 
-
-
 ## About the Project <a name="about"></a>
 The backend for [Ranked Choice Voting](https://github.com/SocietyClub/RCV). 
 For any questions regarding this project contact teamsocietyclub@gmail.com
+
+## Contributing <a name="contributing"></a>
+
+Follow these guidelines:
+
+### Restful Verb Documentation <a name="restful-verb-documenation"></a>
+Read this before you make changes to the API!
+
+https://www.restapitutorial.com/lessons/httpmethods.html
 
 ## Getting Started <a name="start"></a>
 Make sure to install Golang on your local system beforehand: https://golang.org/dl/
