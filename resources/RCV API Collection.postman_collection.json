@@ -19,7 +19,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"pollId\": \"1\",\n    \"rankedChoiceCount\": \"8\"\n}",
+					"raw": "{\n    \"id\": \"2\",\n    \"startDate\": \"2021-07-16T00:00:00+07:00\",\n    \"endDate\": \"2021-07-16T00:00:00+08:00\",\n    \"maxNumRankedChoiceCount\": \"42\",\n    \"Candidate\": \"test 2\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -65,7 +65,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/poll/{1}",
+					"raw": "http://localhost:8080/poll/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -73,7 +73,14 @@
 					"port": "8080",
 					"path": [
 						"poll",
-						"{1}"
+						"2"
+					],
+					"query": [
+						{
+							"key": "",
+							"value": "",
+							"disabled": true
+						}
 					]
 				}
 			},
@@ -120,6 +127,42 @@
 		{
 			"name": "Update Poll",
 			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"startDate\": \"2021-07-16T00:00:00+07:00\",\n    \"endDate\": \"2021-07-16T00:00:00+08:00\",\n    \"maxNumRankedChoiceCount\": \"42\",\n    \"Candidate\": \"test 2\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/poll/2",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"poll",
+						"2"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Patch Poll",
+			"request": {
 				"method": "PATCH",
 				"header": [
 					{
@@ -131,7 +174,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"rankedChoiceCount\": \"7\"\n}",
+					"raw": "{\n    \"candidate\": \"updated 2\"\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -139,7 +182,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/poll/{1}",
+					"raw": "http://localhost:8080/poll/2",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -147,7 +190,7 @@
 					"port": "8080",
 					"path": [
 						"poll",
-						"{1}"
+						"2"
 					]
 				}
 			},

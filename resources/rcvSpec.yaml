@@ -296,7 +296,7 @@ components:
           items:
             $ref: '#/components/schemas/ResultStep'
         yourEntry:
-          type: Vote
+          type: object
           items:
             $ref: '#/components/schemas/VoteInput'
 
