@@ -8,8 +8,8 @@ import (
 	sv "github.com/core-go/service"
 	"github.com/gorilla/mux"
 
-	. "go-service/models"
-	. "go-service/services"
+	. "go-service/internal/models"
+	. "go-service/internal/services"
 )
 
 type PollHandler struct {
@@ -30,13 +30,13 @@ func (h *PollHandler) GetAll(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PollHandler) Load(w http.ResponseWriter, r *http.Request) {
-	pollid := mux.Vars(r)["id"]
-	if len(pollid) == 0 {
-		http.Error(w, "PollId cannot be empty", http.StatusBadRequest)
+	id := mux.Vars(r)["id"]
+	if len(id) == 0 {
+		http.Error(w, "Id cannot be empty", http.StatusBadRequest)
 		return
 	}
 
-	result, err := h.service.Load(r.Context(), pollid)
+	result, err := h.service.Load(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -69,15 +69,15 @@ func (h *PollHandler) Update(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, er1.Error(), http.StatusBadRequest)
 		return
 	}
-	pollid := mux.Vars(r)["id"]
-	if len(pollid) == 0 {
-		http.Error(w, "PollId cannot be empty", http.StatusBadRequest)
+	id := mux.Vars(r)["id"]
+	if len(id) == 0 {
+		http.Error(w, "Id cannot be empty", http.StatusBadRequest)
 		return
 	}
-	if len(poll.PollId) == 0 {
-		poll.PollId = pollid
-	} else if pollid != poll.PollId {
-		http.Error(w, "PollId not match", http.StatusBadRequest)
+	if len(poll.Id) == 0 {
+		poll.Id = id
+	} else if id != poll.Id {
+		http.Error(w, "Id not match", http.StatusBadRequest)
 		return
 	}
 
@@ -90,25 +90,25 @@ func (h *PollHandler) Update(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PollHandler) Patch(w http.ResponseWriter, r *http.Request) {
-	pollid := mux.Vars(r)["id"]
-	if len(pollid) == 0 {
-		http.Error(w, "PollId cannot be empty", http.StatusBadRequest)
+	id := mux.Vars(r)["id"]
+	if len(id) == 0 {
+		http.Error(w, "Id cannot be empty", http.StatusBadRequest)
 		return
 	}
 
-	pollids := []string{"id"}
+	ids := []string{"id"}
 
 	var poll Poll
 	pollType := reflect.TypeOf(poll)
 	_, jsonMap := sv.BuildMapField(pollType)
 	body, _ := sv.BuildMapAndStruct(r, &poll)
-	if len(poll.PollId) == 0 {
-		poll.PollId = pollid
-	} else if pollid != poll.PollId {
-		http.Error(w, "PollId not match", http.StatusBadRequest)
+	if len(poll.Id) == 0 {
+		poll.Id = id
+	} else if id != poll.Id {
+		http.Error(w, "Id not match", http.StatusBadRequest)
 		return
 	}
-	json, er1 := sv.BodyToJson(r, poll, body, pollids, jsonMap, nil)
+	json, er1 := sv.BodyToJson(r, poll, body, ids, jsonMap, nil)
 	if er1 != nil {
 		http.Error(w, er1.Error(), http.StatusInternalServerError)
 		return
@@ -123,12 +123,12 @@ func (h *PollHandler) Patch(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PollHandler) Delete(w http.ResponseWriter, r *http.Request) {
-	pollid := mux.Vars(r)["id"]
-	if len(pollid) == 0 {
-		http.Error(w, "PollId cannot be empty", http.StatusBadRequest)
+	id := mux.Vars(r)["id"]
+	if len(id) == 0 {
+		http.Error(w, "Id cannot be empty", http.StatusBadRequest)
 		return
 	}
-	result, err := h.service.Delete(r.Context(), pollid)
+	result, err := h.service.Delete(r.Context(), id)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

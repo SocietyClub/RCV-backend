@@ -8,7 +8,7 @@ import (
 	fs "github.com/core-go/firestore"
 	"google.golang.org/api/iterator"
 
-	. "go-service/models"
+	. "go-service/internal/models"
 )
 
 type FirestorePollService struct {
@@ -37,66 +37,70 @@ func (s *FirestorePollService) GetAll(ctx context.Context) (*[]Poll, error) {
 			return &polls, er2
 		}
 
-		poll.PollId = doc.Ref.ID
+		poll.Id = doc.Ref.ID
+		poll.StartDate = &doc.CreateTime
+		poll.EndDate = &doc.UpdateTime
 		polls = append(polls, poll)
 	}
 	return &polls, nil
 }
 
-func (s *FirestorePollService) Load(ctx context.Context, pollid string) (*Poll, error) {
-	doc, er1 := s.Collection.Doc(pollid).Get(ctx)
+func (s *FirestorePollService) Load(ctx context.Context, id string) (*Poll, error) {
+	doc, er1 := s.Collection.Doc(id).Get(ctx)
 	var poll Poll
 	if er1 != nil {
 		return nil, er1
 	}
 	er2 := doc.DataTo(&poll)
 	if er2 == nil {
-		poll.PollId = pollid
+		poll.Id = id
+		poll.StartDate = &doc.CreateTime
+		poll.EndDate = &doc.UpdateTime
 	}
 	return &poll, er2
 }
 
-func (s *FirestorePollService) Insert(ctx context.Context, poll *Poll) (int64, error) {
-	_, err := s.Collection.Doc(poll.PollId).Set(ctx, poll)
+func (s *FirestorePollService) Insert(ctx context.Context, poll *Poll) (string, error) {
+	_, err := s.Collection.Doc(poll.Id).Set(ctx, poll)
 	if err != nil {
-		return -1, err
+		return "Failure", err
 	}
-	return 1, nil
+	return "Success", nil
 }
 
-func (s *FirestorePollService) Update(ctx context.Context, poll *Poll) (int64, error) {
-	_, err := s.Collection.Doc(poll.PollId).Set(ctx, poll)
+func (s *FirestorePollService) Update(ctx context.Context, poll *Poll) (string, error) {
+	_, err := s.Collection.Doc(poll.Id).Set(ctx, poll)
 	if err != nil {
-		return -1, err
+		return "Failure", err
 	}
-	return 1, nil
+	return "Success", nil
 }
 
-func (s *FirestorePollService) Patch(ctx context.Context, json map[string]interface{}) (int64, error) {
+func (s *FirestorePollService) Patch(ctx context.Context, json map[string]interface{}) (string, error) {
 	pollType := reflect.TypeOf(Poll{})
 	maps := fs.MakeFirestoreMap(pollType)
 
-	uid := json["pollid"]
-	pollid := uid.(string)
-	docRef := s.Collection.Doc(pollid)
+	uid := json["id"]
+	id := uid.(string)
+	docRef := s.Collection.Doc(id)
 	doc, err1 := docRef.Get(ctx)
 	if err1 != nil {
-		return -1, err1
+		return "Failure", err1
 	}
-	delete(json, "pollid")
+	delete(json, "id")
 
 	dest := fs.MapToFirestore(json, doc, maps)
 	_, err := docRef.Set(ctx, dest)
 	if err != nil {
-		return -1, err
+		return "Failure", err
 	}
-	return 1, nil
+	return "Success", nil
 }
 
-func (s *FirestorePollService) Delete(ctx context.Context, pollid string) (int64, error) {
-	_, err := s.Collection.Doc(pollid).Delete(ctx)
+func (s *FirestorePollService) Delete(ctx context.Context, id string) (string, error) {
+	_, err := s.Collection.Doc(id).Delete(ctx)
 	if err != nil {
-		return -1, err
+		return "Failure", err
 	}
-	return 1, nil
+	return "Success", nil
 }

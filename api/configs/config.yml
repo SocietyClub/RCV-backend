@@ -16,4 +16,5 @@ middleware:
   size: size
 
 # Insert credentials here
-credentials: ''
+credentials: '
+'

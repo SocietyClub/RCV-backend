@@ -8,8 +8,8 @@ import (
 	"github.com/core-go/health/firestore"
 	"google.golang.org/api/option"
 
-	"go-service/handlers"
-	"go-service/services"
+	"go-service/internal/handlers"
+	"go-service/internal/services"
 )
 
 type ApplicationContext struct {

@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"fmt"
-	app "go-service/controller"
 	"net/http"
 	"strconv"
 
@@ -11,19 +10,20 @@ import (
 	"github.com/core-go/log"
 	mid "github.com/core-go/log/middleware"
 	"github.com/gorilla/mux"
+
+	"go-service/internal/app"
 )
 
 func main() {
 
-	// Loading Configs from Service Account
+	// Loading database credentials to client
 	fmt.Println("Loading Configs")
 	var conf app.Root
-	error1 := config.Load(&conf, "configs/config")
-	if error1 != nil {
-		panic(error1)
+	er1 := config.Load(&conf, "configs/config")
+	if er1 != nil {
+		panic(er1)
 	}
 
-	// Setting up Mux Route and using configs
 	r := mux.NewRouter()
 
 	log.Initialize(conf.Log)
@@ -34,9 +34,9 @@ func main() {
 	}
 	r.Use(mid.Recover(log.ErrorMsg))
 
-	error2 := app.Route(r, context.Background(), conf)
-	if error2 != nil {
-		panic(error2)
+	er2 := app.Route(r, context.Background(), conf)
+	if er2 != nil {
+		panic(er2)
 	}
 
 	// Start Server
@@ -45,7 +45,7 @@ func main() {
 	if conf.Server.Port > 0 {
 		server = ":" + strconv.FormatInt(conf.Server.Port, 10)
 	}
-	if error3 := http.ListenAndServe(server, r); error3 != nil {
-		fmt.Println(error3.Error())
+	if er3 := http.ListenAndServe(server, r); er3 != nil {
+		fmt.Println(er3.Error())
 	}
 }
