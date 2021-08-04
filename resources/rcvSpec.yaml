@@ -5,7 +5,11 @@ info:
   description: >-
     This is the API for Creating, Managing and Fetching Polls and Votes for the RCV Project.
   contact:
+    name: Team Society Club
     email: teamsocietyclub@gmail.com
+servers:
+  - description: Ranked Choice Voting API Endpoints (Production)
+    url: 'https://{server}/ranked-choice-vote/v1'
 tags:
   - name: Polls
     description: Operations for a poll
@@ -35,18 +39,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/AddPollResponse'
         '400':
-          description: Invalid Poll supplied
-          content: {}
+          $ref: '#/components/responses/400BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError' 
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
         '404':
-          description: Poll not found
-          content: {}
-
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
+          
   '/poll/{pollID}':
     get:
       tags:
@@ -56,10 +60,13 @@ paths:
       parameters:
         - name: pollID
           in: path
-          description: Poll ID to interact with
+          description: Distinct Poll ID for poll.
           required: true
           schema:
-            type: integer
+            type: string
+            minLength: 0
+            maxLength: 14
+            pattern: '^([a-zA-Z0-9]){0,14}$'
       security:
         - bearerAuth: []
       responses:
@@ -70,18 +77,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetPollResponse'
         '400':
-          description: Invalid PollID supplied
-          content: {}
+          $ref: '#/components/responses/400BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError' 
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
         '404':
-          description: Poll not found
-          content: {}
-
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
     patch:
       tags:
         - Polls
@@ -111,18 +117,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetPollResponse'
         '400':
-          description: Invalid Poll Details supplied
-          content: {}
+          $ref: '#/components/responses/400BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError' 
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
         '404':
-          description: Poll not found
-          content: {}
-
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
     delete:
       tags:
         - Polls
@@ -131,10 +136,13 @@ paths:
       parameters:
         - name: pollID
           in: path
-          description: Poll ID to interact with
+          description: Distinct Poll ID for poll.
           required: true
           schema:
-            type: integer
+            type: string
+            minLength: 0
+            maxLength: 14
+            pattern: '^([a-zA-Z0-9]){0,14}$'
       security:
         - bearerAuth: []
       responses:
@@ -145,17 +153,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/Messages'
         '400':
-          description: Invalid PollID supplied
-          content: {}
+          $ref: '#/components/responses/400BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError' 
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
         '404':
-          description: Poll not found
-          content: {}
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
 
   '/poll/{pollID}/results':
     get:
@@ -166,10 +174,13 @@ paths:
       parameters:
         - name: pollID
           in: path
-          description: Poll ID to interact with
+          description: Distinct Poll ID for poll.
           required: true
           schema:
-            type: integer
+            type: string
+            minLength: 0
+            maxLength: 14
+            pattern: '^([a-zA-Z0-9]){0,14}$'
       security:
         - bearerAuth: []
       responses:
@@ -180,17 +191,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/PollResults'
         '400':
-          description: Invalid PollID supplied
-          content: {}
+          $ref: '#/components/responses/400BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError' 
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
         '404':
-          description: Poll not found
-          content: {}
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
 
   '/poll/{pollID}/vote':
     post:
@@ -200,10 +211,13 @@ paths:
       parameters:
         - name: pollID
           in: path
-          description: Poll ID to interact with
+          description: Distinct Poll ID for poll.
           required: true
           schema:
-            type: integer
+            type: string
+            minLength: 0
+            maxLength: 14
+            pattern: '^([a-zA-Z0-9]){0,14}$'
       requestBody:
         description: Vote Input Object
         required: true
@@ -221,17 +235,17 @@ paths:
               schema:
                 $ref: '#/components/schemas/GetPollResponse'
         '400':
-          description: Invalid PollID supplied
-          content: {}
+          $ref: '#/components/responses/400BadRequest'
         '401':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UnauthorizedError' 
+          $ref: '#/components/responses/401Unauthorized'
+        '403':
+          $ref: '#/components/responses/403Forbidden'
         '404':
-          description: Poll not found
-          content: {}
+          $ref: '#/components/responses/404NotFound'
+        '422':
+          $ref: '#/components/responses/422UnprocessableEntity'
+        '500':
+          $ref: '#/components/responses/500InternalServerError'
 
 components:
   securitySchemes:
@@ -239,9 +253,55 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-  schemas:
 
-    # Requests 
+  responses:
+  
+##### Common Responses
+    400BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+            
+    401Unauthorized:
+      description: Authorization information is missing or invalid.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+
+    403Forbidden:
+      description: Assess token does not have required scope.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+
+    404NotFound:
+      description: The specified resource was not found.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+
+    422UnprocessableEntity:
+      description: Unprocessable Entity.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+
+    500InternalServerError:
+      description: General Error when API malfunction.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+
+  schemas:
+  
+##### Requests 
     PollRequest:
       type: object
       description: This is the object request information needed to add a poll.
@@ -293,7 +353,7 @@ components:
           minItems: 0
           maxItems: 100
 
-    # Responses
+##### Responses
     AddPollResponse:
       type: object
       properties:
@@ -408,8 +468,7 @@ components:
           items:
             $ref: '#/components/schemas/VoteInput'
 
-  # Objects
-  
+##### Objects
     ResultStep:
       type: object
       properties:
@@ -426,6 +485,10 @@ components:
       properties:
         name:
           type: string
+          description: Name of candidate.
+          minLength: 1
+          maxLength: 80
+          pattern: '^([a-zA-Z0-9]){1,80}$'
           example: Spiderman
 
     CandidateResults:
@@ -433,6 +496,10 @@ components:
       properties:
         name:
           type: string
+          description: Name of candidate.
+          minLength: 1
+          maxLength: 80
+          pattern: '^([a-zA-Z0-9]){1,80}$'
           example: Spiderman
         votes:
           type: array
@@ -473,16 +540,9 @@ components:
           type: string
           example: Spiderman
 
-    UnauthorizedError:
-      type: object
-      properties:
-        description:
-          type: string
-          example: Not Authorized
-
     Messages:
       type: object
-      description: This is a message object
+      description: This is a message object.
       required: 
         - status
         - messageList
@@ -491,6 +551,7 @@ components:
           $ref: '#/components/schemas/Status'
         messageList: 
           $ref: '#/components/schemas/Message'
+
     Message:
       type: object
       description: This is a message object for status.
@@ -509,12 +570,14 @@ components:
             End user displayable information which might help diagnose a warning.
           type: string
           maxLength: 400
+    
     Status:
       type: string
-      description: Overall result of the response
+      description: Overall result of the response.
       enum:
         - SUCCESSFUL
         - FAILURE
+    
     Severity:
       type: string
       description: The messages severity level.
