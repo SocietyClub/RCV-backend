@@ -22,13 +22,15 @@ paths:
         - Polls
       summary: Creates a new Poll
       operationId: createPoll
+      parameters:
+        - $ref: '#/components/parameters/X-USER-ID'
       requestBody:
         description: New Poll Details
         required: true
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/PollRequest'
+              $ref: '#/components/schemas/CreatePollRequest'
       security:
         - bearerAuth: []
       responses:
@@ -51,22 +53,15 @@ paths:
         '500':
           $ref: '#/components/responses/500InternalServerError'
           
-  '/poll/{pollID}':
+  '/poll/{PollID}':
     get:
       tags:
         - Polls
       summary: Gets a specific Poll by its ID.
       operationId: getPoll
       parameters:
-        - name: pollID
-          in: path
-          description: Distinct Poll ID for poll.
-          required: true
-          schema:
-            type: string
-            minLength: 0
-            maxLength: 14
-            pattern: '^([a-zA-Z0-9]){0,14}$'
+        - $ref: '#/components/parameters/X-USER-ID'
+        - $ref: '#/components/parameters/PollID'
       security:
         - bearerAuth: []
       responses:
@@ -94,19 +89,15 @@ paths:
       summary: Updates an existing Poll
       operationId: updatePoll
       parameters:
-        - name: pollID
-          in: path
-          description: Poll ID to interact with
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/X-USER-ID'
+        - $ref: '#/components/parameters/PollID'
       requestBody:
         description: Updated Poll Details
         required: true
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/PollRequest'
+              $ref: '#/components/schemas/UpdatePollRequest'
       security:
         - bearerAuth: []
       responses:
@@ -134,15 +125,8 @@ paths:
       summary: Deletes an existing Poll
       operationId: deletePoll
       parameters:
-        - name: pollID
-          in: path
-          description: Distinct Poll ID for poll.
-          required: true
-          schema:
-            type: string
-            minLength: 0
-            maxLength: 14
-            pattern: '^([a-zA-Z0-9]){0,14}$'
+        - $ref: '#/components/parameters/X-USER-ID'
+        - $ref: '#/components/parameters/PollID'
       security:
         - bearerAuth: []
       responses:
@@ -165,22 +149,15 @@ paths:
         '500':
           $ref: '#/components/responses/500InternalServerError'
 
-  '/poll/{pollID}/results':
+  '/poll/{PollID}/results':
     get:
       tags:
         - Polls
       summary: Gets the Results of a specific Poll by its ID
       operationId: getPollResults
       parameters:
-        - name: pollID
-          in: path
-          description: Distinct Poll ID for poll.
-          required: true
-          schema:
-            type: string
-            minLength: 0
-            maxLength: 14
-            pattern: '^([a-zA-Z0-9]){0,14}$'
+        - $ref: '#/components/parameters/X-USER-ID'
+        - $ref: '#/components/parameters/PollID'
       security:
         - bearerAuth: []
       responses:
@@ -203,21 +180,14 @@ paths:
         '500':
           $ref: '#/components/responses/500InternalServerError'
 
-  '/poll/{pollID}/vote':
+  '/poll/{PollID}/vote':
     post:
       tags:
         - Votes
       summary: Cast a vote for a specific Poll
       parameters:
-        - name: pollID
-          in: path
-          description: Distinct Poll ID for poll.
-          required: true
-          schema:
-            type: string
-            minLength: 0
-            maxLength: 14
-            pattern: '^([a-zA-Z0-9]){0,14}$'
+        - $ref: '#/components/parameters/X-USER-ID'
+        - $ref: '#/components/parameters/PollID'
       requestBody:
         description: Vote Input Object
         required: true
@@ -253,6 +223,25 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
+  
+  parameters:
+    X-USER-ID:
+      name: X-USER-ID
+      description: User id UUID.
+      in: header
+      required: true
+      schema:
+        type: string
+    PollID:
+      name: PollID
+      description: Distinct Poll ID for poll.
+      in: path
+      required: true
+      schema:
+        type: string
+        minLength: 0
+        maxLength: 14
+        pattern: '^([a-zA-Z0-9]){0,14}$'
 
   responses:
   
@@ -302,46 +291,19 @@ components:
   schemas:
   
 ##### Requests 
-    PollRequest:
+    CreatePollRequest:
       type: object
       description: This is the object request information needed to add a poll.
       required: 
-        - startDate
         - pollName
         - maxNumRankedChoiceCount
         - candidateList
       properties:
-        ##TODO : ADD Poll Creator ID (Cookie UUID)
-        pollId:
-          description: Id for Poll that was created.
-          type: string
-          minLength: 0
-          maxLength: 14
-          pattern: '^([a-zA-Z0-9]){0,14}$'
-        pollOpen:
-          description: Poll status on being opened for users.
-          type: boolean
-        startDate:
-          description: Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
-          type: string
-          format: date-time
-          example: '2021-04-21T17:32:28Z'
-        endDate:
-          description: End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
-          type: string
-          format: date-time
-          example: '2021-04-21T17:32:28Z'
         pollName:
           description: Name for Poll entered by the user used as information purposes only.
           type: string
           minLength: 0
           maxLength: 30
-          pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
-        pollDesc:
-          description: Optional description for Poll entered by the user used as information purposes only.
-          type: string
-          minLength: 0
-          maxLength: 500
           pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
         maxNumRankedChoiceCount:
           type: integer
@@ -352,6 +314,31 @@ components:
             $ref: '#/components/schemas/Candidate'
           minItems: 0
           maxItems: 100
+
+    UpdatePollRequest:
+      type: object
+      description: This is the object request information needed to add a poll.
+      properties:
+        ##TODO : ADD Poll Creator ID (Cookie UUID)
+        pollOpen:
+          description: Poll status on being opened for users.
+          type: boolean
+        pollName:
+          description: Name for Poll entered by the user used as information purposes only.
+          type: string
+          minLength: 0
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
+        maxNumRankedChoiceCount:
+          type: integer
+          format: int32
+        candidateList:
+          type: array
+          items:
+            $ref: '#/components/schemas/Candidate'
+          minItems: 0
+          maxItems: 100
+
 
 ##### Responses
     AddPollResponse:
@@ -390,6 +377,15 @@ components:
           type: string
           format: date-time
           example: '2021-04-21T17:32:28Z'
+        maxNumRankedChoiceCount:
+          type: integer
+          format: int32
+        candidateList:
+          type: array
+          items:
+            $ref: '#/components/schemas/Candidate'
+          minItems: 0
+          maxItems: 100
 
     GetPollResponse:
       type: object
