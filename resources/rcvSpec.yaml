@@ -1,6 +1,6 @@
 openapi: 3.0.1
 info:
-  version: 1.0.0
+  version: 1.0.0-dev
   title: Ranked Choice Voting API
   description: >-
     This is the API for Creating, Managing and Fetching Polls and Votes for the RCV Project.
@@ -12,7 +12,6 @@ tags:
   - name: Votes
     description: Operations for individual votes
 paths:
-  # Create Poll is defined by post (Restfull way)
   '/poll':
     post:
       tags:
@@ -25,16 +24,16 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/PollDetails'
+              $ref: '#/components/schemas/PollRequest'
       security:
-        - rcvBearerAuth: []
+        - bearerAuth: []
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Poll'
+                $ref: '#/components/schemas/AddPollResponse'
         '400':
           description: Invalid Poll supplied
           content: {}
@@ -52,7 +51,7 @@ paths:
     get:
       tags:
         - Polls
-      summary: Gets a specific Poll by its ID
+      summary: Gets a specific Poll by its ID.
       operationId: getPoll
       parameters:
         - name: pollID
@@ -62,14 +61,14 @@ paths:
           schema:
             type: integer
       security:
-        - rcvBearerAuth: []
+        - bearerAuth: []
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Poll'
+                $ref: '#/components/schemas/GetPollResponse'
         '400':
           description: Invalid PollID supplied
           content: {}
@@ -101,16 +100,16 @@ paths:
         content:
           '*/*':
             schema:
-              $ref: '#/components/schemas/PollDetails'
+              $ref: '#/components/schemas/PollRequest'
       security:
-        - rcvBearerAuth: []
+        - bearerAuth: []
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Poll'
+                $ref: '#/components/schemas/GetPollResponse'
         '400':
           description: Invalid Poll Details supplied
           content: {}
@@ -137,14 +136,14 @@ paths:
           schema:
             type: integer
       security:
-        - rcvBearerAuth: []
+        - bearerAuth: []
       responses:
-        '200':
+        '204':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Poll'
+                $ref: '#/components/schemas/Messages'
         '400':
           description: Invalid PollID supplied
           content: {}
@@ -172,7 +171,7 @@ paths:
           schema:
             type: integer
       security:
-        - rcvBearerAuth: []
+        - bearerAuth: []
       responses:
         '200':
           description: Success
@@ -213,14 +212,14 @@ paths:
             schema:
               $ref: '#/components/schemas/VoteInput'
       security:
-        - rcvBearerAuth: []
+        - bearerAuth: []
       responses:
         '200':
           description: Success
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Poll'
+                $ref: '#/components/schemas/GetPollResponse'
         '400':
           description: Invalid PollID supplied
           content: {}
@@ -235,46 +234,155 @@ paths:
           content: {}
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
   schemas:
-    # Why aren't Poll and PollDetails the same?
-    # Poll should have start and end dates
-    Poll:
-      type: object
-      properties:
-        # ADD Poll Creator ID (Cookie UUID)
-        # ADD Missing title
-        # ADD Open For Voting
-        # Enforce timezone in ISO Format (with timezone)
-        startDate:
-          type: string
-          example: '2021-04-28 01:45:00.0000 -05:00'
-        endDate: # This should be optional
-          type: string
-          example: '2021-05-01 12:00:00.0000 -05:00'
-        pollId:
-          type: integer
-          format: int64
-        maxNumRankedChoiceCount:
-          type: integer
-          format: int32
-        candidates:
-          type: array
-          items:
-            $ref: '#/components/schemas/Candidate'
 
-    PollDetails:
+    # Requests 
+    PollRequest:
       type: object
+      description: This is the object request information needed to add a poll.
+      required: 
+        - startDate
+        - pollName
+        - maxNumRankedChoiceCount
+        - candidateList
       properties:
-        # ADD Poll Creator ID (Cookie UUID)
-        # ADD Missing title
-        # ADD Open For Voting
+        ##TODO : ADD Poll Creator ID (Cookie UUID)
+        pollId:
+          description: Id for Poll that was created.
+          type: string
+          minLength: 0
+          maxLength: 14
+          pattern: '^([a-zA-Z0-9]){0,14}$'
+        pollOpen:
+          description: Poll status on being opened for users.
+          type: boolean
+        startDate:
+          description: Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          type: string
+          format: date-time
+          example: '2021-04-21T17:32:28Z'
+        endDate:
+          description: End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          type: string
+          format: date-time
+          example: '2021-04-21T17:32:28Z'
+        pollName:
+          description: Name for Poll entered by the user used as information purposes only.
+          type: string
+          minLength: 0
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
+        pollDesc:
+          description: Optional description for Poll entered by the user used as information purposes only.
+          type: string
+          minLength: 0
+          maxLength: 500
+          pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
         maxNumRankedChoiceCount:
           type: integer
           format: int32
-        candidates:
+        candidateList:
           type: array
           items:
             $ref: '#/components/schemas/Candidate'
+          minItems: 0
+          maxItems: 100
+
+    # Responses
+    AddPollResponse:
+      type: object
+      properties:
+        messages: 
+          $ref: '#/components/schemas/Messages' 
+        addPollData: 
+          $ref: '#/components/schemas/AddPollData' 
+
+    AddPollData:
+      type: object
+      properties:
+        pollId:
+          description: Id for Poll that was created.
+          type: string
+          minLength: 0
+          maxLength: 14
+          pattern: '^([a-zA-Z0-9]){0,14}$'
+        pollOpen:
+          description: Poll status on being opened for users.
+          type: boolean
+        pollName:
+          description: Name for Poll entered by the user used as information purposes only.
+          type: string
+          minLength: 0
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
+        startDate:
+          description: Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          type: string
+          format: date-time
+          example: '2021-04-21T17:32:28Z'
+        endDate:
+          description: End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          type: string
+          format: date-time
+          example: '2021-04-21T17:32:28Z'
+
+    GetPollResponse:
+      type: object
+      properties:
+        messages: 
+          $ref: '#/components/schemas/Messages' 
+        getPollData: 
+          $ref: '#/components/schemas/GetPollData' 
+
+    GetPollData:
+      type: object
+      description: This is the object request information needed to add a poll.
+      properties:
+        pollId:
+          description: Id for Poll that was created.
+          type: string
+          minLength: 0
+          maxLength: 14
+          pattern: '^([a-zA-Z0-9]){0,14}$'
+        pollOpen:
+          description: Poll status on being opened for users.
+          type: boolean
+        startDate:
+          description: Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          type: string
+          format: date-time
+          example: '2021-04-21T17:32:28Z'
+        endDate:
+          description: End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          type: string
+          format: date-time
+          example: '2021-04-21T17:32:28Z'
+        pollName:
+          description: Name for Poll entered by the user used as information purposes only.
+          type: string
+          minLength: 0
+          maxLength: 30
+          pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
+        pollDesc:
+          description: Optional description for Poll entered by the user used as information purposes only.
+          type: string
+          minLength: 0
+          maxLength: 500
+          pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
+        maxNumRankedChoiceCount:
+          type: integer
+          format: int32
+        candidateList:
+          type: array
+          items:
+            $ref: '#/components/schemas/Candidate'
+          minItems: 0
+          maxItems: 100
 
     PollResults:
       type: object
@@ -300,13 +408,15 @@ components:
           items:
             $ref: '#/components/schemas/VoteInput'
 
+  # Objects
+  
     ResultStep:
       type: object
       properties:
         stepId:
           type: integer
           format: int64
-        candidates:
+        candidateList:
           type: array
           items:
             $ref: '#/components/schemas/CandidateResults'
@@ -369,10 +479,47 @@ components:
         description:
           type: string
           example: Not Authorized
-  
-  securitySchemes:
-    rcvBearerAuth:
-      type: http
-      scheme: bearer
-      bearerFormat: JWT
 
+    Messages:
+      type: object
+      description: This is a message object
+      required: 
+        - status
+        - messageList
+      properties:
+        status: 
+          $ref: '#/components/schemas/Status'
+        messageList: 
+          $ref: '#/components/schemas/Message'
+    Message:
+      type: object
+      description: This is a message object for status.
+      required: 
+        - severity
+        - messageContent
+      properties:
+        severity: 
+          $ref: '#/components/schemas/Severity'
+        code: 
+          description: >- 
+            Alphanumeric code that can be used to identify error and warning messages.
+          type: string
+        messageContent:
+          description:  >- 
+            End user displayable information which might help diagnose a warning.
+          type: string
+          maxLength: 400
+    Status:
+      type: string
+      description: Overall result of the response
+      enum:
+        - SUCCESSFUL
+        - FAILURE
+    Severity:
+      type: string
+      description: The messages severity level.
+      enum:
+        - FATAL
+        - ERROR
+        - WARNING
+        - INFO
