@@ -9,6 +9,8 @@ Run this in your terminal (replace out-open-api-example with your own OpenAPI ya
 
 > Note: the command above assumes your UID is 1000. We pass the UID into the docker run command so it does not create files as root (Dockers default).
 
+> :warning: DO NOT RUN THIS. This is only for the initial code generation when the first rcvSpec.yaml was created!!
+
 ```
 docker run --rm \
     -v $PWD:/local \

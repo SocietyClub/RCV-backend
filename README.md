@@ -66,9 +66,6 @@ go run main.go
 
 ## Other Development Info <a name="other"></a>
 
-### Generating Go from an OpenAPI Spec
-See [how-to-use-open-api-generator.md](how-to-use-open-api-generator.md) for details
-
 ### Deployment
 Only package maintainers have access to deploy. These instructions are for them.
 
