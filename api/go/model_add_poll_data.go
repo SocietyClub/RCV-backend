@@ -22,14 +22,17 @@ type AddPollData struct {
 	// Poll status on being opened for users.
 	PollOpen bool `json:"pollOpen,omitempty"`
 
-	// Name for Poll entered by the user used as information purposes only.
-	PollName string `json:"pollName,omitempty"`
-
 	// Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
 	StartDate time.Time `json:"startDate,omitempty"`
 
 	// End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
 	EndDate time.Time `json:"endDate,omitempty"`
+
+	// Name for Poll entered by the user used as information purposes only.
+	PollName string `json:"pollName,omitempty"`
+
+	// Optional description for Poll entered by the user used as information purposes only.
+	PollDesc string `json:"pollDesc,omitempty"`
 
 	MaxNumRankedChoiceCount int32 `json:"maxNumRankedChoiceCount,omitempty"`
 

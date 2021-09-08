@@ -582,6 +582,7 @@ components:
           pollOpen: true
           pollName: pollName
           endDate: 2021-04-21T17:32:28Z
+          pollDesc: pollDesc
           pollId: pollId
           maxNumRankedChoiceCount: 0
           candidateList:
@@ -606,6 +607,7 @@ components:
         pollOpen: true
         pollName: pollName
         endDate: 2021-04-21T17:32:28Z
+        pollDesc: pollDesc
         pollId: pollId
         maxNumRankedChoiceCount: 0
         candidateList:
@@ -625,13 +627,6 @@ components:
         pollOpen:
           description: Poll status on being opened for users.
           type: boolean
-        pollName:
-          description: Name for Poll entered by the user used as information purposes
-            only.
-          maxLength: 30
-          minLength: 0
-          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
-          type: string
         startDate:
           description: Start date and time for poll to be open. Generated as ISO-0601
             that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
@@ -643,6 +638,20 @@ components:
             that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
           example: 2021-04-21T17:32:28Z
           format: date-time
+          type: string
+        pollName:
+          description: Name for Poll entered by the user used as information purposes
+            only.
+          maxLength: 30
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
+          type: string
+        pollDesc:
+          description: Optional description for Poll entered by the user used as information
+            purposes only.
+          maxLength: 500
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
           type: string
         maxNumRankedChoiceCount:
           format: int32
