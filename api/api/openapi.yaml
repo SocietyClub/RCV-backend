@@ -1,0 +1,985 @@
+openapi: 3.0.1
+info:
+  contact:
+    email: teamsocietyclub@gmail.com
+    name: Team Society Club
+  description: This is the API for Creating, Managing and Fetching Polls and Votes
+    for the RCV Project.
+  title: Ranked Choice Voting API
+  version: 1.0.0-dev
+servers:
+- description: Ranked Choice Voting API Endpoints (Production)
+  url: https://{server}/ranked-choice-vote/v1
+tags:
+- description: Operations for a poll
+  name: Polls
+- description: Operations for individual votes
+  name: Votes
+paths:
+  /poll:
+    post:
+      operationId: createPoll
+      parameters:
+      - description: User id UUID.
+        explode: false
+        in: header
+        name: X-USER-ID
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/CreatePollRequest'
+        description: New Poll Details
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AddPollResponse'
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Authorization information is missing or invalid.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Assess token does not have required scope.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: The specified resource was not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Unprocessable Entity.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: General Error when API malfunction.
+      security:
+      - bearerAuth: []
+      summary: Creates a new Poll
+      tags:
+      - Polls
+  /poll/{PollID}:
+    delete:
+      operationId: deletePoll
+      parameters:
+      - description: User id UUID.
+        explode: false
+        in: header
+        name: X-USER-ID
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Distinct Poll ID for poll.
+        explode: false
+        in: path
+        name: PollID
+        required: true
+        schema:
+          maxLength: 14
+          minLength: 0
+          pattern: ^([a-zA-Z0-9]){0,14}$
+          type: string
+        style: simple
+      responses:
+        "204":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Authorization information is missing or invalid.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Assess token does not have required scope.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: The specified resource was not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Unprocessable Entity.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: General Error when API malfunction.
+      security:
+      - bearerAuth: []
+      summary: Deletes an existing Poll
+      tags:
+      - Polls
+    get:
+      operationId: getPoll
+      parameters:
+      - description: User id UUID.
+        explode: false
+        in: header
+        name: X-USER-ID
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Distinct Poll ID for poll.
+        explode: false
+        in: path
+        name: PollID
+        required: true
+        schema:
+          maxLength: 14
+          minLength: 0
+          pattern: ^([a-zA-Z0-9]){0,14}$
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPollResponse'
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Authorization information is missing or invalid.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Assess token does not have required scope.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: The specified resource was not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Unprocessable Entity.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: General Error when API malfunction.
+      security:
+      - bearerAuth: []
+      summary: Gets a specific Poll by its ID.
+      tags:
+      - Polls
+    patch:
+      operationId: updatePoll
+      parameters:
+      - description: User id UUID.
+        explode: false
+        in: header
+        name: X-USER-ID
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Distinct Poll ID for poll.
+        explode: false
+        in: path
+        name: PollID
+        required: true
+        schema:
+          maxLength: 14
+          minLength: 0
+          pattern: ^([a-zA-Z0-9]){0,14}$
+          type: string
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/UpdatePollRequest'
+        description: Updated Poll Details
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPollResponse'
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Authorization information is missing or invalid.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Assess token does not have required scope.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: The specified resource was not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Unprocessable Entity.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: General Error when API malfunction.
+      security:
+      - bearerAuth: []
+      summary: Updates an existing Poll
+      tags:
+      - Polls
+  /poll/{PollID}/results:
+    get:
+      operationId: getPollResults
+      parameters:
+      - description: User id UUID.
+        explode: false
+        in: header
+        name: X-USER-ID
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Distinct Poll ID for poll.
+        explode: false
+        in: path
+        name: PollID
+        required: true
+        schema:
+          maxLength: 14
+          minLength: 0
+          pattern: ^([a-zA-Z0-9]){0,14}$
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PollResults'
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Authorization information is missing or invalid.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Assess token does not have required scope.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: The specified resource was not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Unprocessable Entity.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: General Error when API malfunction.
+      security:
+      - bearerAuth: []
+      summary: Gets the Results of a specific Poll by its ID
+      tags:
+      - Polls
+  /poll/{PollID}/vote:
+    post:
+      parameters:
+      - description: User id UUID.
+        explode: false
+        in: header
+        name: X-USER-ID
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: Distinct Poll ID for poll.
+        explode: false
+        in: path
+        name: PollID
+        required: true
+        schema:
+          maxLength: 14
+          minLength: 0
+          pattern: ^([a-zA-Z0-9]){0,14}$
+          type: string
+        style: simple
+      requestBody:
+        content:
+          '*/*':
+            schema:
+              $ref: '#/components/schemas/VoteInput'
+        description: Vote Input Object
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetPollResponse'
+          description: Success
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Authorization information is missing or invalid.
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Assess token does not have required scope.
+        "404":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: The specified resource was not found.
+        "422":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: Unprocessable Entity.
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Messages'
+          description: General Error when API malfunction.
+      security:
+      - bearerAuth: []
+      summary: Cast a vote for a specific Poll
+      tags:
+      - Votes
+components:
+  parameters:
+    X-USER-ID:
+      description: User id UUID.
+      explode: false
+      in: header
+      name: X-USER-ID
+      required: true
+      schema:
+        type: string
+      style: simple
+    PollID:
+      description: Distinct Poll ID for poll.
+      explode: false
+      in: path
+      name: PollID
+      required: true
+      schema:
+        maxLength: 14
+        minLength: 0
+        pattern: ^([a-zA-Z0-9]){0,14}$
+        type: string
+      style: simple
+  responses:
+    "400BadRequest":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+      description: Bad Request
+    "401Unauthorized":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+      description: Authorization information is missing or invalid.
+    "403Forbidden":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+      description: Assess token does not have required scope.
+    "404NotFound":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+      description: The specified resource was not found.
+    "422UnprocessableEntity":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+      description: Unprocessable Entity.
+    "500InternalServerError":
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Messages'
+      description: General Error when API malfunction.
+  schemas:
+    CreatePollRequest:
+      description: This is the object request information needed to add a poll.
+      example:
+        pollName: pollName
+        maxNumRankedChoiceCount: 0
+        candidateList:
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+      properties:
+        pollName:
+          description: Name for Poll entered by the user used as information purposes
+            only.
+          maxLength: 30
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
+          type: string
+        maxNumRankedChoiceCount:
+          format: int32
+          type: integer
+        candidateList:
+          items:
+            $ref: '#/components/schemas/Candidate'
+          maxItems: 100
+          minItems: 0
+          type: array
+      required:
+      - candidateList
+      - maxNumRankedChoiceCount
+      - pollName
+      type: object
+    UpdatePollRequest:
+      description: This is the object request information needed to add a poll.
+      example:
+        pollOpen: true
+        pollName: pollName
+        maxNumRankedChoiceCount: 0
+        candidateList:
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+      properties:
+        pollOpen:
+          description: Poll status on being opened for users.
+          type: boolean
+        pollName:
+          description: Name for Poll entered by the user used as information purposes
+            only.
+          maxLength: 30
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
+          type: string
+        maxNumRankedChoiceCount:
+          format: int32
+          type: integer
+        candidateList:
+          items:
+            $ref: '#/components/schemas/Candidate'
+          maxItems: 100
+          minItems: 0
+          type: array
+      type: object
+    AddPollResponse:
+      example:
+        addPollData:
+          pollOpen: true
+          pollName: pollName
+          endDate: 2021-04-21T17:32:28Z
+          pollDesc: pollDesc
+          pollId: pollId
+          maxNumRankedChoiceCount: 0
+          candidateList:
+          - name: Spiderman
+          - name: Spiderman
+          - name: Spiderman
+          - name: Spiderman
+          - name: Spiderman
+          startDate: 2021-04-21T17:32:28Z
+        messages:
+          messageList:
+            code: code
+            messageContent: messageContent
+      properties:
+        messages:
+          $ref: '#/components/schemas/Messages'
+        addPollData:
+          $ref: '#/components/schemas/AddPollData'
+      type: object
+    AddPollData:
+      example:
+        pollOpen: true
+        pollName: pollName
+        endDate: 2021-04-21T17:32:28Z
+        pollDesc: pollDesc
+        pollId: pollId
+        maxNumRankedChoiceCount: 0
+        candidateList:
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        startDate: 2021-04-21T17:32:28Z
+      properties:
+        pollId:
+          description: Id for Poll that was created.
+          maxLength: 14
+          minLength: 0
+          pattern: ^([a-zA-Z0-9]){0,14}$
+          type: string
+        pollOpen:
+          description: Poll status on being opened for users.
+          type: boolean
+        startDate:
+          description: Start date and time for poll to be open. Generated as ISO-0601
+            that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          example: 2021-04-21T17:32:28Z
+          format: date-time
+          type: string
+        endDate:
+          description: End date and time for poll to be open. Generated as ISO-0601
+            that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          example: 2021-04-21T17:32:28Z
+          format: date-time
+          type: string
+        pollName:
+          description: Name for Poll entered by the user used as information purposes
+            only.
+          maxLength: 30
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
+          type: string
+        pollDesc:
+          description: Optional description for Poll entered by the user used as information
+            purposes only.
+          maxLength: 500
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
+          type: string
+        maxNumRankedChoiceCount:
+          format: int32
+          type: integer
+        candidateList:
+          items:
+            $ref: '#/components/schemas/Candidate'
+          maxItems: 100
+          minItems: 0
+          type: array
+      type: object
+    GetPollResponse:
+      example:
+        getPollData:
+          pollOpen: true
+          pollName: pollName
+          endDate: 2021-04-21T17:32:28Z
+          pollDesc: pollDesc
+          pollId: pollId
+          maxNumRankedChoiceCount: 0
+          candidateList:
+          - name: Spiderman
+          - name: Spiderman
+          - name: Spiderman
+          - name: Spiderman
+          - name: Spiderman
+          startDate: 2021-04-21T17:32:28Z
+        messages:
+          messageList:
+            code: code
+            messageContent: messageContent
+      properties:
+        messages:
+          $ref: '#/components/schemas/Messages'
+        getPollData:
+          $ref: '#/components/schemas/GetPollData'
+      type: object
+    GetPollData:
+      description: This is the object request information needed to add a poll.
+      example:
+        pollOpen: true
+        pollName: pollName
+        endDate: 2021-04-21T17:32:28Z
+        pollDesc: pollDesc
+        pollId: pollId
+        maxNumRankedChoiceCount: 0
+        candidateList:
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        - name: Spiderman
+        startDate: 2021-04-21T17:32:28Z
+      properties:
+        pollId:
+          description: Id for Poll that was created.
+          maxLength: 14
+          minLength: 0
+          pattern: ^([a-zA-Z0-9]){0,14}$
+          type: string
+        pollOpen:
+          description: Poll status on being opened for users.
+          type: boolean
+        startDate:
+          description: Start date and time for poll to be open. Generated as ISO-0601
+            that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          example: 2021-04-21T17:32:28Z
+          format: date-time
+          type: string
+        endDate:
+          description: End date and time for poll to be open. Generated as ISO-0601
+            that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          example: 2021-04-21T17:32:28Z
+          format: date-time
+          type: string
+        pollName:
+          description: Name for Poll entered by the user used as information purposes
+            only.
+          maxLength: 30
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
+          type: string
+        pollDesc:
+          description: Optional description for Poll entered by the user used as information
+            purposes only.
+          maxLength: 500
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
+          type: string
+        maxNumRankedChoiceCount:
+          format: int32
+          type: integer
+        candidateList:
+          items:
+            $ref: '#/components/schemas/Candidate'
+          maxItems: 100
+          minItems: 0
+          type: array
+      type: object
+    PollResults:
+      example:
+        winner: Spiderman
+        yourEntry:
+        - choices:
+          - candidate:
+              name: Spiderman
+            choicePosition: 7
+          - candidate:
+              name: Spiderman
+            choicePosition: 7
+        - choices:
+          - candidate:
+              name: Spiderman
+            choicePosition: 7
+          - candidate:
+              name: Spiderman
+            choicePosition: 7
+        pollId: 0
+        totalSteps: 1
+        totalEntries: 6
+        steps:
+        - stepId: 5
+          candidateList:
+          - name: Spiderman
+            votes:
+            - voteCount: 2
+              choicePosition: 5
+            - voteCount: 2
+              choicePosition: 5
+          - name: Spiderman
+            votes:
+            - voteCount: 2
+              choicePosition: 5
+            - voteCount: 2
+              choicePosition: 5
+        - stepId: 5
+          candidateList:
+          - name: Spiderman
+            votes:
+            - voteCount: 2
+              choicePosition: 5
+            - voteCount: 2
+              choicePosition: 5
+          - name: Spiderman
+            votes:
+            - voteCount: 2
+              choicePosition: 5
+            - voteCount: 2
+              choicePosition: 5
+      properties:
+        pollId:
+          format: int64
+          type: integer
+        totalEntries:
+          format: int32
+          type: integer
+        totalSteps:
+          format: int32
+          type: integer
+        winner:
+          example: Spiderman
+          type: string
+        steps:
+          items:
+            $ref: '#/components/schemas/ResultStep'
+          type: array
+        yourEntry:
+          items:
+            $ref: '#/components/schemas/VoteInput'
+          type: array
+      type: object
+    ResultStep:
+      example:
+        stepId: 5
+        candidateList:
+        - name: Spiderman
+          votes:
+          - voteCount: 2
+            choicePosition: 5
+          - voteCount: 2
+            choicePosition: 5
+        - name: Spiderman
+          votes:
+          - voteCount: 2
+            choicePosition: 5
+          - voteCount: 2
+            choicePosition: 5
+      properties:
+        stepId:
+          format: int64
+          type: integer
+        candidateList:
+          items:
+            $ref: '#/components/schemas/CandidateResults'
+          type: array
+      type: object
+    Candidate:
+      example:
+        name: Spiderman
+      properties:
+        name:
+          description: Name of candidate.
+          example: Spiderman
+          maxLength: 80
+          minLength: 1
+          pattern: ^([a-zA-Z0-9]){1,80}$
+          type: string
+      type: object
+    CandidateResults:
+      example:
+        name: Spiderman
+        votes:
+        - voteCount: 2
+          choicePosition: 5
+        - voteCount: 2
+          choicePosition: 5
+      properties:
+        name:
+          description: Name of candidate.
+          example: Spiderman
+          maxLength: 80
+          minLength: 1
+          pattern: ^([a-zA-Z0-9]){1,80}$
+          type: string
+        votes:
+          items:
+            $ref: '#/components/schemas/VoteCount'
+          type: array
+      type: object
+    VoteCount:
+      example:
+        voteCount: 2
+        choicePosition: 5
+      properties:
+        choicePosition:
+          format: int32
+          type: integer
+        voteCount:
+          format: int32
+          type: integer
+      type: object
+    VoteInput:
+      example:
+        choices:
+        - candidate:
+            name: Spiderman
+          choicePosition: 7
+        - candidate:
+            name: Spiderman
+          choicePosition: 7
+      properties:
+        choices:
+          items:
+            $ref: '#/components/schemas/Vote'
+          type: array
+      type: object
+    Vote:
+      example:
+        candidate:
+          name: Spiderman
+        choicePosition: 7
+      properties:
+        choicePosition:
+          format: int32
+          type: integer
+        candidate:
+          $ref: '#/components/schemas/CandidateVote'
+      type: object
+    CandidateVote:
+      example:
+        name: Spiderman
+      properties:
+        name:
+          example: Spiderman
+          type: string
+      type: object
+    Messages:
+      description: This is a message object.
+      example:
+        messageList:
+          code: code
+          messageContent: messageContent
+      properties:
+        status:
+          $ref: '#/components/schemas/Status'
+        messageList:
+          $ref: '#/components/schemas/Message'
+      required:
+      - messageList
+      - status
+      type: object
+    Message:
+      description: This is a message object for status.
+      example:
+        code: code
+        messageContent: messageContent
+      properties:
+        severity:
+          $ref: '#/components/schemas/Severity'
+        code:
+          description: Alphanumeric code that can be used to identify error and warning
+            messages.
+          type: string
+        messageContent:
+          description: End user displayable information which might help diagnose
+            a warning.
+          maxLength: 400
+          type: string
+      required:
+      - messageContent
+      - severity
+      type: object
+    Status:
+      description: Overall result of the response.
+      enum:
+      - SUCCESSFUL
+      - FAILURE
+      type: string
+    Severity:
+      description: The messages severity level.
+      enum:
+      - FATAL
+      - ERROR
+      - WARNING
+      - INFO
+      type: string
+  securitySchemes:
+    bearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
