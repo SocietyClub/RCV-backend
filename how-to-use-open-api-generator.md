@@ -14,7 +14,7 @@ docker run --rm \
     -v $PWD:/local \
     -u ${UID}:${UID} \
     openapitools/openapi-generator-cli generate \
-        -i /local/rcvSpec.yaml \
+        -i /local/resources/rcvSpec.yaml \
         -g go-server \
         -o /local/api/
 ```
