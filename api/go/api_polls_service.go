@@ -12,12 +12,13 @@ package openapi
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"fmt"
+	"net/http"
 )
 
 // PollsApiService is a service that implents the logic for the PollsApiServicer
-// This service should implement the business logic for every endpoint for the PollsApi API. 
+// This service should implement the business logic for every endpoint for the PollsApi API.
 // Include any external packages or services that will be required by this service.
 type PollsApiService struct {
 }
@@ -87,31 +88,15 @@ func (s *PollsApiService) DeletePoll(ctx context.Context, xUSERID string, pollID
 
 // GetPoll - Gets a specific Poll by its ID.
 func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID string) (ImplResponse, error) {
-	// TODO - update GetPoll with the required logic for this service method.
-	// Add api_polls_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	context_background := context.Background()
+	firestore_client := GetFirestoreClient(context_background)
+	poll, err := firestore_client.Collection("polls").Doc(pollID).Get(ctx)
 
-	//TODO: Uncomment the next line to return response Response(200, GetPollResponse{}) or use other options such as http.Ok ...
-	//return Response(200, GetPollResponse{}), nil
+	if err != nil {
+		return Response(http.StatusNotFound, nil), fmt.Errorf("GetPoll could not find the given pollID: %s", pollID)
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, Messages{}) or use other options such as http.Ok ...
-	//return Response(400, Messages{}), nil
-
-	//TODO: Uncomment the next line to return response Response(401, Messages{}) or use other options such as http.Ok ...
-	//return Response(401, Messages{}), nil
-
-	//TODO: Uncomment the next line to return response Response(403, Messages{}) or use other options such as http.Ok ...
-	//return Response(403, Messages{}), nil
-
-	//TODO: Uncomment the next line to return response Response(404, Messages{}) or use other options such as http.Ok ...
-	//return Response(404, Messages{}), nil
-
-	//TODO: Uncomment the next line to return response Response(422, Messages{}) or use other options such as http.Ok ...
-	//return Response(422, Messages{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, Messages{}) or use other options such as http.Ok ...
-	//return Response(500, Messages{}), nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("GetPoll method not implemented")
+	return Response(http.StatusOK, poll.Data()), nil
 }
 
 // GetPollResults - Gets the Results of a specific Poll by its ID
@@ -171,4 +156,3 @@ func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdatePoll method not implemented")
 }
-
