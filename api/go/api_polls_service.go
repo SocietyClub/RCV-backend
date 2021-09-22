@@ -12,12 +12,13 @@ package openapi
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"fmt"
+	"net/http"
 )
 
 // PollsApiService is a service that implents the logic for the PollsApiServicer
-// This service should implement the business logic for every endpoint for the PollsApi API. 
+// This service should implement the business logic for every endpoint for the PollsApi API.
 // Include any external packages or services that will be required by this service.
 type PollsApiService struct {
 }
@@ -111,7 +112,15 @@ func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID st
 	//TODO: Uncomment the next line to return response Response(500, Messages{}) or use other options such as http.Ok ...
 	//return Response(500, Messages{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("GetPoll method not implemented")
+	context_background := context.Background()
+	firestore_client := GetFirestoreClient(context_background)
+	poll, err := firestore_client.Collection("polls").Doc(pollID).Get(ctx)
+
+	if err != nil {
+		return Response(http.StatusNotFound, nil), fmt.Errorf("GetPoll could not find the given pollID: %s", pollID)
+	}
+
+	return Response(http.StatusOK, poll), nil
 }
 
 // GetPollResults - Gets the Results of a specific Poll by its ID
@@ -171,4 +180,3 @@ func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID
 
 	return Response(http.StatusNotImplemented, nil), errors.New("UpdatePoll method not implemented")
 }
-
