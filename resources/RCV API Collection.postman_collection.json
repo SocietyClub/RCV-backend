@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "d6328db3-1f98-46e3-b35f-6c47889b9551",
+		"_postman_id": "a43fe28a-88ea-4380-be81-707cab00ac77",
 		"name": "RCV API Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -42,6 +42,19 @@
 		},
 		{
 			"name": "Get Poll",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Body is correct\", function () {\r",
+							"    pm.response.to.have.body('{\"candidateList\":[\"spiderman\"],\"endDate\":\"2021-09-08T22:50:09.98Z\",\"maxNumRankedChoiceCount\":1,\"pollDesc\":\"\",\"pollId\":\"\",\"pollName\":\"\",\"pollOpen\":true,\"startDate\":\"2021-09-08T22:50:05.494Z\"}\\n');\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
 			"protocolProfileBehavior": {
 				"disableBodyPruning": true
 			},
@@ -65,15 +78,17 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/poll/2",
+					"raw": "http://localhost:8080/ranked-choice-vote/v1/poll/test-do-not-deleto",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
+						"ranked-choice-vote",
+						"v1",
 						"poll",
-						"2"
+						"test-do-not-deleto"
 					],
 					"query": [
 						{
