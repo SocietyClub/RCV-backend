@@ -40,21 +40,6 @@ type Router interface {
 
 const errMsgRequiredMissing = "required parameter is missing"
 
-
-// type Dumb struct {
-// }
-
-
-// func (d *Dumb) AcceptOptions() http.Handler {
-// 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-// 		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-USER-ID")
-// 		w.Header().Set("Access-Control-Allow-Methods", "POST")
-// 		w.Header().Set("Access-Control-Allow-Origin", "*")
-// 		w.WriteHeader(http.StatusOK)
-// 	});
-// }
-
 // NewRouter creates a new router for any number of api routers
 func NewRouter(routers ...Router) *mux.Router {
 	router := mux.NewRouter().StrictSlash(true)
@@ -70,58 +55,26 @@ func NewRouter(routers ...Router) *mux.Router {
 				Name(route.Name).
 				Handler(handler)
 
-			// var handler2 http.Handler
-			// handler2 = route.HandlerFunc
-			// handler2 = Logger(handler, AcceptOptions)
-
-			// d := &Dumb{}
-
 			router.
 				Methods("OPTIONS").
 				Path(route.Pattern).
 				Name(route.Method + "-AcceptOptions").
-				Handler(
-					http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-						w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-						w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-USER-ID")
-						w.Header().Set("Access-Control-Allow-Methods", "POST")
-						w.Header().Set("Access-Control-Allow-Origin", "*")
-						w.WriteHeader(http.StatusOK)
-					}))
+				Handler(AcceptOptions())
 		}
 	}
-
 	return router
 }
 
 
-
-// func (d *Dumb) AcceptOptions(w http.ResponseWriter, r *http.Request) {
-// 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-// 	w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-USER-ID")
-// 	w.Header().Set("Access-Control-Allow-Methods", "POST")
-// 	w.Header().Set("Access-Control-Allow-Origin", "*")
-// 	w.WriteHeader(http.StatusOK)
-// }
-
-// func handlerWrapper(h http.Handler) http.Handler {
-//   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//     fmt.Println("Before")
-//     h.ServeHTTP(w, r) // call original
-//     fmt.Println("After")
-//   })
-// }
-
-
-
-// func handlerWrapper(h http.Handler) http.Handler {
-//   return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//     fmt.Println("Before")
-//     h.ServeHTTP(w, r) // call original
-//     fmt.Println("After")
-//   })
-// }
-
+func AcceptOptions() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-USER-ID")
+		w.Header().Set("Access-Control-Allow-Methods", "POST")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.WriteHeader(http.StatusOK)
+	})
+}
 
 
 // EncodeJSONResponse uses the json encoder to write an interface to the http response with an optional status code
