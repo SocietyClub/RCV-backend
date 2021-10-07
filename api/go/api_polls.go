@@ -14,7 +14,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strings"
-	"fmt"
 
 	"github.com/gorilla/mux"
 )
@@ -68,16 +67,9 @@ func (c *PollsApiController) Routes() Routes {
 
 // CreatePoll - Creates a new Poll
 func (c *PollsApiController) CreatePoll(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("YOLO, Request")
-	fmt.Println(r)
 	xUSERID := r.Header.Get("X-USER-ID")
 	createPollRequest := &CreatePollRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&createPollRequest); err != nil {
-
-		fmt.Println("Writing header without EncodeJSONResponse")
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.Header().Set("Access-Control-Allow-Methods", "POST")
-		w.Header().Set("Access-Control-Allow-Origin", "*")
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
