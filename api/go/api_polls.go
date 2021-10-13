@@ -64,6 +64,7 @@ func (c *PollsApiController) Routes() Routes {
 	}
 }
 
+
 // CreatePoll - Creates a new Poll
 func (c *PollsApiController) CreatePoll(w http.ResponseWriter, r *http.Request) {
 	xUSERID := r.Header.Get("X-USER-ID")

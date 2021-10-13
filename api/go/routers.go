@@ -13,20 +13,21 @@ package openapi
 import (
 	"encoding/json"
 	"errors"
-	"github.com/gorilla/mux"
 	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
+
+	"github.com/gorilla/mux"
 )
 
 // A Route defines the parameters for an api endpoint
 type Route struct {
-	Name		string
-	Method	  string
-	Pattern	 string
+	Name        string
+	Method      string
+	Pattern     string
 	HandlerFunc http.HandlerFunc
 }
 
@@ -39,6 +40,9 @@ type Router interface {
 }
 
 const errMsgRequiredMissing = "required parameter is missing"
+
+// TODO: Update this accordingly to allow for Local development and PROD environment
+const accessControlAllowOrigin = "*"
 
 // NewRouter creates a new router for any number of api routers
 func NewRouter(routers ...Router) *mux.Router {
@@ -54,16 +58,32 @@ func NewRouter(routers ...Router) *mux.Router {
 				Path(route.Pattern).
 				Name(route.Name).
 				Handler(handler)
+
+			router.
+				Methods("OPTIONS").
+				Path(route.Pattern).
+				Name(route.Method + "-AcceptOptions").
+				Handler(AcceptOptions())
 		}
 	}
-
 	return router
+}
+
+func AcceptOptions() http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
+		w.Header().Set("Access-Control-Allow-Headers", "Accept, Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-USER-ID")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, PATCH, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Origin", accessControlAllowOrigin)
+		w.WriteHeader(http.StatusOK)
+	})
 }
 
 // EncodeJSONResponse uses the json encoder to write an interface to the http response with an optional status code
 func EncodeJSONResponse(i interface{}, status *int, w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
+	w.Header().Set("Access-Control-Allow-Methods", "POST, PATCH, DELETE, OPTIONS")
+	w.Header().Set("Access-Control-Allow-Origin", accessControlAllowOrigin)
 	if status != nil {
 		w.WriteHeader(*status)
 	} else {
