@@ -13,14 +13,12 @@ package main
 import (
 	"log"
 	"net/http"
-	"fmt"
 
 	openapi "github.com/SocietyClub/RCV-backend/go"
 )
 
 func main() {
 	log.Printf("Server started")
-	fmt.Print("Test print")
 
 	PollsApiService := openapi.NewPollsApiService()
 	PollsApiController := openapi.NewPollsApiController(PollsApiService)
