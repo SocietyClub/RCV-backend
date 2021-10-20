@@ -12,7 +12,6 @@ package openapi
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -91,6 +90,9 @@ func (s *PollsApiService) DeletePoll(ctx context.Context, xUSERID string, pollID
 func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID string) (ImplResponse, error) {
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
+
+	defer firestore_client.Close()
+
 	poll, err := firestore_client.Collection("polls").Doc(pollID).Get(ctx)
 
 	if err != nil {
@@ -98,10 +100,10 @@ func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID st
 	}
 
 	var poll_model GetPollResponse
-	poll_string, _ := json.Marshal(poll.Data())
-	json.Unmarshal(poll_string, &poll_model.GetPollData)
+	err = poll.DataTo(&poll_model.GetPollData)
 
 	if err != nil {
+		fmt.Println(err)
 		return Response(http.StatusNotAcceptable, nil), fmt.Errorf("GetPoll could not load the given pollID: %s", pollID)
 	}
 
