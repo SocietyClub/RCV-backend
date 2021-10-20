@@ -104,7 +104,7 @@ func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID st
 		return Response(http.StatusNotFound, poll_model), err
 	}
 
-	err = poll.DataTo(&poll_model.GetPollData)
+	err = poll.DataTo(&poll_model.Data)
 
 	if err != nil {
 		AddMessage(&messages, Severity(ERROR), "GetPoll-1", fmt.Sprintf("GetPoll could not load the given pollID(%s): %s", pollID, err))
