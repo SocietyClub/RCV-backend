@@ -13,5 +13,5 @@ package openapi
 type Candidate struct {
 
 	// Name of candidate.
-	Name string `json:"name,omitempty"`
+	Name string `json:"name"`
 }

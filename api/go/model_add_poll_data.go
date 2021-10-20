@@ -14,27 +14,20 @@ import (
 	"time"
 )
 
+// Id for Poll that was created.
+// Poll status on being opened for users.
+// Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+// End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+// Name for Poll entered by the user used as information purposes only.
+// Optional description for Poll entered by the user used as information purposes only.
+
 type AddPollData struct {
-
-	// Id for Poll that was created.
-	PollId string `json:"pollId,omitempty"`
-
-	// Poll status on being opened for users.
-	PollOpen bool `json:"pollOpen,omitempty"`
-
-	// Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
-	StartDate time.Time `json:"startDate,omitempty"`
-
-	// End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
-	EndDate time.Time `json:"endDate,omitempty"`
-
-	// Name for Poll entered by the user used as information purposes only.
-	PollName string `json:"pollName,omitempty"`
-
-	// Optional description for Poll entered by the user used as information purposes only.
-	PollDesc string `json:"pollDesc,omitempty"`
-
-	MaxNumRankedChoiceCount int32 `json:"maxNumRankedChoiceCount,omitempty"`
-
-	CandidateList []Candidate `json:"candidateList,omitempty"`
+	PollId                  string      `json:"pollId" firestore:"pollId,omitempty"`
+	PollOpen                bool        `json:"pollOpen" firestore:"pollOpen,omitempty"`
+	StartDate               time.Time   `json:"startDate" firestore:"startDate,omitempty"`
+	EndDate                 time.Time   `json:"endDate" firestore:"endDate,omitempty"`
+	PollName                string      `json:"pollName" firestore:"pollName,omitempty"`
+	PollDesc                string      `json:"pollDesc" firestore:"pollDesc,omitempty"`
+	MaxNumRankedChoiceCount int32       `json:"maxNumRankedChoiceCount" firestore:"maxNumRankedChoiceCount,omitempty"`
+	CandidateList           []Candidate `json:"candidateList" firestore:"candidateList,omitempty"`
 }

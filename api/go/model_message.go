@@ -12,12 +12,9 @@ package openapi
 
 // Message - This is a message object for status.
 type Message struct {
-
 	Severity Severity `json:"severity"`
-
 	// Alphanumeric code that can be used to identify error and warning messages.
-	Code string `json:"code,omitempty"`
-
+	Code string `json:"code"`
 	// End user displayable information which might help diagnose a warning.
 	MessageContent string `json:"messageContent"`
 }

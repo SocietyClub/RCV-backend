@@ -15,6 +15,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
+
+	"cloud.google.com/go/firestore"
 )
 
 // PollsApiService is a service that implents the logic for the PollsApiServicer
@@ -28,13 +31,74 @@ func NewPollsApiService() PollsApiServicer {
 	return &PollsApiService{}
 }
 
+const (
+	collectionName string = "polls"
+)
+
 // CreatePoll - Creates a new Poll
 func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, createPollRequest CreatePollRequest) (ImplResponse, error) {
-	// TODO - update CreatePoll with the required logic for this service method.
-	// Add api_polls_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	context_background := context.Background()
+	firestore_client := GetFirestoreClient(context_background)
+
+	// closes client after function returns a value
+	defer firestore_client.Close()
+
+	// Mapping body request
+	ref, _, err1 := firestore_client.Collection(collectionName).Add(context_background, map[string]interface{}{
+		"PollOpen":                false,
+		"PollName":                createPollRequest.PollName,
+		"StartDate":               time.Now().Format(time.RFC3339),
+		"EndDate":                 time.Now().Format(time.RFC3339),
+		"MaxNumRankedChoiceCount": createPollRequest.MaxNumRankedChoiceCount,
+		"CandidateList":           createPollRequest.CandidateList,
+	})
+
+	if err1 != nil {
+		return Response(http.StatusNotFound, nil), fmt.Errorf("failed creating new Poll because: %v", err1)
+	}
+
+	// Get created document id and set to poll id
+	pollid := firestore_client.Collection(collectionName).Doc(ref.ID)
+	_, err := firestore_client.Collection(collectionName).Doc(pollid.ID).Set(context_background, map[string]interface{}{
+		"PollId": pollid.ID,
+	}, firestore.MergeAll)
+
+	if err != nil {
+		return Response(http.StatusNotFound, nil), fmt.Errorf("failed creating new Poll because: %v", err)
+	}
+
+	var message Message
+	message.Severity = Severity(INFO)
+	message.Code = "000000"
+	message.MessageContent = "Poll successfully created"
+
+	var messages Messages
+	messages.Status = Status(SUCCESSFUL)
+	messages.MessageList = message
+
+	var addPollResponse AddPollResponse
+	addPollResponse.Messages = messages
+
+	addPollData, _ := firestore_client.Collection(collectionName).Doc(pollid.ID).Get(context_background)
+
+	// addPollData := AddPollData{
+	// 	PollId:                  doc.Data()["PollId"].(string),
+	// 	PollOpen:                doc.Data()["PollOpen"].(bool),
+	// 	StartDate:               doc.Data()["StartDate"].(time.Time),
+	// 	EndDate:                 doc.Data()["EndDate"].(time.Time),
+	// 	PollName:                doc.Data()["PollName"].(string),
+	// 	PollDesc:                doc.Data()["PollDesc"].(string),
+	// 	MaxNumRankedChoiceCount: doc.Data()["MaxNumRankedChoiceCount"].(int32),
+	// 	CandidateList:           doc.Data()["CandidateList"].([]Candidate),
+	// }
+
+	// addPollResponse.AddPollData = c
+
+	return Response(http.StatusOK, addPollData.Data()), nil
+	// return Response(http.StatusOK, createPollRequest), nil
 
 	//TODO: Uncomment the next line to return response Response(200, AddPollResponse{}) or use other options such as http.Ok ...
-	//return Response(200, AddPollResponse{}), nil
+	// return Response(200, AddPollResponse{}), nil
 
 	//TODO: Uncomment the next line to return response Response(400, Messages{}) or use other options such as http.Ok ...
 	//return Response(400, Messages{}), nil
@@ -54,7 +118,7 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	//TODO: Uncomment the next line to return response Response(500, Messages{}) or use other options such as http.Ok ...
 	//return Response(500, Messages{}), nil
 
-	return Response(http.StatusNotImplemented, nil), errors.New("CreatePoll method not implemented")
+	// return Response(http.StatusNotImplemented, nil), errors.New("CreatePoll method not implemented")
 }
 
 // DeletePoll - Deletes an existing Poll
@@ -90,7 +154,7 @@ func (s *PollsApiService) DeletePoll(ctx context.Context, xUSERID string, pollID
 func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID string) (ImplResponse, error) {
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
-	poll, err := firestore_client.Collection("polls").Doc(pollID).Get(ctx)
+	poll, err := firestore_client.Collection(collectionName).Doc(pollID).Get(ctx)
 
 	if err != nil {
 		return Response(http.StatusNotFound, nil), fmt.Errorf("GetPoll could not find the given pollID: %s", pollID)

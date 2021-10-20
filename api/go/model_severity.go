@@ -9,13 +9,14 @@
  */
 
 package openapi
+
 // Severity : The messages severity level.
 type Severity string
 
 // List of Severity
 const (
-	FATAL Severity = "FATAL"
-	ERROR Severity = "ERROR"
+	FATAL   Severity = "FATAL"
+	ERROR   Severity = "ERROR"
 	WARNING Severity = "WARNING"
-	INFO Severity = "INFO"
+	INFO    Severity = "INFO"
 )

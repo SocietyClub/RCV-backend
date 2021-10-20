@@ -9,11 +9,12 @@
  */
 
 package openapi
+
 // Status : Overall result of the response.
 type Status string
 
 // List of Status
 const (
 	SUCCESSFUL Status = "SUCCESSFUL"
-	FAILURE Status = "FAILURE"
+	FAILURE    Status = "FAILURE"
 )

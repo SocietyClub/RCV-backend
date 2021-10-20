@@ -12,8 +12,6 @@ package openapi
 
 // Messages - This is a message object.
 type Messages struct {
-
-	Status Status `json:"status"`
-
+	Status      Status  `json:"status"`
 	MessageList Message `json:"messageList"`
 }
