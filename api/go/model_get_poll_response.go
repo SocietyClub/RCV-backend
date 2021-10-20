@@ -11,8 +11,7 @@
 package openapi
 
 type GetPollResponse struct {
-
 	Messages Messages `json:"messages,omitempty"`
 
-	GetPollData GetPollData `json:"getPollData,omitempty"`
+	Data GetPollData `json:"data,omitempty"`
 }
