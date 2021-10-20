@@ -12,6 +12,7 @@ package openapi
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -96,7 +97,15 @@ func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID st
 		return Response(http.StatusNotFound, nil), fmt.Errorf("GetPoll could not find the given pollID: %s", pollID)
 	}
 
-	return Response(http.StatusOK, poll.Data()), nil
+	var poll_model GetPollResponse
+	poll_string, _ := json.Marshal(poll.Data())
+	json.Unmarshal(poll_string, &poll_model.GetPollData)
+
+	if err != nil {
+		return Response(http.StatusNotAcceptable, nil), fmt.Errorf("GetPoll could not load the given pollID: %s", pollID)
+	}
+
+	return Response(http.StatusOK, poll_model), nil
 }
 
 // GetPollResults - Gets the Results of a specific Poll by its ID
