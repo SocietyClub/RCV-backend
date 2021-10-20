@@ -109,7 +109,7 @@ func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID st
 
 		poll_model.Messages = messages
 
-		return Response(http.StatusNotAcceptable, poll_model), fmt.Errorf(message.MessageContent)
+		return Response(http.StatusNotFound, poll_model), fmt.Errorf(message.MessageContent)
 	}
 
 	err = poll.DataTo(&poll_model.GetPollData)
