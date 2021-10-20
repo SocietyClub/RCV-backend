@@ -88,15 +88,33 @@ func (s *PollsApiService) DeletePoll(ctx context.Context, xUSERID string, pollID
 
 // GetPoll - Gets a specific Poll by its ID.
 func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID string) (ImplResponse, error) {
+	var messages Messages
+	var poll_model GetPollResponse
+
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
+
+	defer firestore_client.Close()
+
 	poll, err := firestore_client.Collection("polls").Doc(pollID).Get(ctx)
 
 	if err != nil {
-		return Response(http.StatusNotFound, nil), fmt.Errorf("GetPoll could not find the given pollID: %s", pollID)
+		AddMessage(&messages, Severity(ERROR), "GetPoll-0", fmt.Sprintf("GetPoll could not find the given pollID(%s): %s", pollID, err))
+		poll_model.Messages = messages
+		return Response(http.StatusNotFound, poll_model), err
 	}
 
-	return Response(http.StatusOK, poll.Data()), nil
+	err = poll.DataTo(&poll_model.GetPollData)
+
+	if err != nil {
+		AddMessage(&messages, Severity(ERROR), "GetPoll-1", fmt.Sprintf("GetPoll could not load the given pollID(%s): %s", pollID, err))
+		poll_model.Messages = messages
+		return Response(http.StatusNotAcceptable, poll_model), err
+	}
+
+	AddMessage(&messages, Severity(INFO), "GetPoll-OK", "Poll successfully retreived")
+	poll_model.Messages = messages
+	return Response(http.StatusOK, poll_model), nil
 }
 
 // GetPollResults - Gets the Results of a specific Poll by its ID
