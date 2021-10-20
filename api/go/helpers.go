@@ -12,8 +12,24 @@ package openapi
 
 //Response return a ImplResponse struct filled
 func Response(code int, body interface{}) ImplResponse {
-	return ImplResponse {
+	return ImplResponse{
 		Code: code,
 		Body: body,
 	}
+}
+
+//Message struct appender ??
+func AddMessage(messages *Messages, severity Severity, code string, content string) {
+	var message Message
+
+	message.Severity = severity
+	message.Code = code
+	message.MessageContent = content
+
+	if message.Severity == Severity(ERROR) {
+		messages.Status = Status(ERROR)
+	} else {
+		messages.Status = Status(SUCCESSFUL)
+	}
+	messages.MessageList = message // Todo: message list is not a list, yikes.
 }
