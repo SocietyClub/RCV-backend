@@ -17,6 +17,7 @@ import (
 	"net/http"
 
 	"cloud.google.com/go/firestore"
+	"github.com/google/uuid"
 )
 
 // PollsApiService is a service that implents the logic for the PollsApiServicer
@@ -46,8 +47,9 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	// Closes client after function returns a value
 	defer firestore_client.Close()
 
-	// Create a Firestore document reference
-	polldoc := firestore_client.Collection(collectionName).NewDoc()
+	// Generate UUID and assign to Firestore document
+	uuidWithHyphen := uuid.New()
+	polldoc := firestore_client.Collection(collectionName).Doc(uuidWithHyphen.String())
 
 	// Mapping body request
 	_, err := firestore_client.Collection(collectionName).Doc(polldoc.ID).Set(ctx, map[string]interface{}{
@@ -83,7 +85,7 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 		return Response(http.StatusNotAcceptable, addPollResponse), err2
 	}
 
-	AddMessage(&messages, Severity(INFO), "000000", "Poll successfully created")
+	AddMessage(&messages, Severity(INFO), "000000", "Poll Created")
 	addPollResponse.Messages = messages
 	return Response(http.StatusOK, addPollResponse), nil
 }
