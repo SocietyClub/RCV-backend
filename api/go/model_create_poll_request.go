@@ -13,7 +13,7 @@ package openapi
 // CreatePollRequest - This is the object request information needed to add a poll.
 type CreatePollRequest struct {
 	// Name for Poll entered by the user used as information purposes only.
-	PollName                string      `json:"pollName"`
+	PollName                string      `json:"pollName" validate:"required,max=30"`
 	MaxNumRankedChoiceCount int32       `json:"maxNumRankedChoiceCount"`
-	CandidateList           []Candidate `json:"candidateList"`
+	CandidateList           []Candidate `json:"candidateList" validate:"required,max=100"`
 }

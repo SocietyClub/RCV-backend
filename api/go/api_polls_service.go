@@ -43,11 +43,15 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
 
-	// closes client after function returns a value
+	// Closes client after function returns a value
 	defer firestore_client.Close()
 
+	// Create a Firestore document reference
+	polldoc := firestore_client.Collection(collectionName).NewDoc()
+
 	// Mapping body request
-	ref, _, err := firestore_client.Collection(collectionName).Add(ctx, map[string]interface{}{
+	_, err := firestore_client.Collection(collectionName).Doc(polldoc.ID).Set(ctx, map[string]interface{}{
+		"PollId":                  polldoc.ID,
 		"PollOpen":                true,
 		"PollName":                createPollRequest.PollName,
 		"StartDate":               firestore.ServerTimestamp,
@@ -56,28 +60,17 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 		"CandidateList":           createPollRequest.CandidateList,
 	})
 
+	// Check for Requests Errors
 	if err != nil {
 		AddMessage(&messages, Severity(ERROR), "Request Body issue", fmt.Sprintf("Poll could not be created: %s", err))
 		addPollResponse.Messages = messages
 		return Response(http.StatusNotFound, addPollResponse), err
 	}
 
-	// Get created document id and set to poll id
-	pollid := firestore_client.Collection(collectionName).Doc(ref.ID)
-	_, err1 := firestore_client.Collection(collectionName).Doc(pollid.ID).Set(ctx, map[string]interface{}{
-		"PollId": pollid.ID,
-	}, firestore.MergeAll)
-
-	if err1 != nil {
-		AddMessage(&messages, Severity(ERROR), "Unable to update Poll Id", fmt.Sprintf("Poll Id could not updated: %s", err1))
-		addPollResponse.Messages = messages
-		return Response(http.StatusNotFound, addPollResponse), err1
-	}
-
-	addPollData, err2 := firestore_client.Collection(collectionName).Doc(pollid.ID).Get(ctx)
+	addPollData, err2 := firestore_client.Collection(collectionName).Doc(polldoc.ID).Get(ctx)
 
 	if err2 != nil {
-		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollid.ID, err2))
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", polldoc.ID, err2))
 		addPollResponse.Messages = messages
 		return Response(http.StatusNotFound, addPollResponse), err2
 	}
@@ -85,7 +78,7 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	err2 = addPollData.DataTo(&addPollResponse.Data)
 
 	if err2 != nil {
-		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollid.ID, err2))
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", polldoc.ID, err2))
 		addPollResponse.Messages = messages
 		return Response(http.StatusNotAcceptable, addPollResponse), err2
 	}
