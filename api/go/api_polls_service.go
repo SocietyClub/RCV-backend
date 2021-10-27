@@ -51,6 +51,8 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	uuidWithHyphen := uuid.New()
 	polldoc := firestore_client.Collection(collectionName).Doc(uuidWithHyphen.String())
 
+	// TODO: Validate Body requests to ensure it meets regex and limit requirements
+
 	// Mapping body request
 	_, err := firestore_client.Collection(collectionName).Doc(polldoc.ID).Set(ctx, map[string]interface{}{
 		"PollId":                  polldoc.ID,
