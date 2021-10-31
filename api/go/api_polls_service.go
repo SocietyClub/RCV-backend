@@ -94,31 +94,22 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 
 // DeletePoll - Deletes an existing Poll
 func (s *PollsApiService) DeletePoll(ctx context.Context, xUSERID string, pollID string) (ImplResponse, error) {
-	// TODO - update DeletePoll with the required logic for this service method.
-	// Add api_polls_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+	var messages Messages
 
-	//TODO: Uncomment the next line to return response Response(204, Messages{}) or use other options such as http.Ok ...
-	//return Response(204, Messages{}), nil
+	context_background := context.Background()
+	firestore_client := GetFirestoreClient(context_background)
 
-	//TODO: Uncomment the next line to return response Response(400, Messages{}) or use other options such as http.Ok ...
-	//return Response(400, Messages{}), nil
+	defer firestore_client.Close()
 
-	//TODO: Uncomment the next line to return response Response(401, Messages{}) or use other options such as http.Ok ...
-	//return Response(401, Messages{}), nil
+	_, err := firestore_client.Collection(collectionName).Doc(pollID).Delete(ctx)
 
-	//TODO: Uncomment the next line to return response Response(403, Messages{}) or use other options such as http.Ok ...
-	//return Response(403, Messages{}), nil
+	if err != nil {
+		AddMessage(&messages, Severity(ERROR), "DeletePoll-0", fmt.Sprintf("API malfunction for pollID(%s): %s", pollID, err))
+		return Response(http.StatusInternalServerError, messages), err
+	}
 
-	//TODO: Uncomment the next line to return response Response(404, Messages{}) or use other options such as http.Ok ...
-	//return Response(404, Messages{}), nil
-
-	//TODO: Uncomment the next line to return response Response(422, Messages{}) or use other options such as http.Ok ...
-	//return Response(422, Messages{}), nil
-
-	//TODO: Uncomment the next line to return response Response(500, Messages{}) or use other options such as http.Ok ...
-	//return Response(500, Messages{}), nil
-
-	return Response(http.StatusNotImplemented, nil), errors.New("DeletePoll method not implemented")
+	AddMessage(&messages, Severity(INFO), "DeletePoll-OK", "Poll Deleted")
+	return Response(http.StatusNoContent, messages), nil
 }
 
 // GetPoll - Gets a specific Poll by its ID.
