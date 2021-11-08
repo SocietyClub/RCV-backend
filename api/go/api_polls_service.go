@@ -185,29 +185,48 @@ func (s *PollsApiService) GetPollResults(ctx context.Context, xUSERID string, po
 
 // UpdatePoll - Updates an existing Poll
 func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID string, updatePollRequest UpdatePollRequest) (ImplResponse, error) {
-	// TODO - update UpdatePoll with the required logic for this service method.
-	// Add api_polls_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, GetPollResponse{}) or use other options such as http.Ok ...
-	//return Response(200, GetPollResponse{}), nil
+	var messages Messages
+	var poll_model GetPollResponse
 
-	//TODO: Uncomment the next line to return response Response(400, Messages{}) or use other options such as http.Ok ...
-	//return Response(400, Messages{}), nil
+	context_background := context.Background()
+	firestore_client := GetFirestoreClient(context_background)
 
-	//TODO: Uncomment the next line to return response Response(401, Messages{}) or use other options such as http.Ok ...
-	//return Response(401, Messages{}), nil
+	defer firestore_client.Close()
 
-	//TODO: Uncomment the next line to return response Response(403, Messages{}) or use other options such as http.Ok ...
-	//return Response(403, Messages{}), nil
+	// Mapping body request
+	_, err := firestore_client.Collection(collectionName).Doc(pollID).Set(ctx, map[string]interface{}{
+		"PollOpen":                updatePollRequest.PollOpen,
+		"PollName":                updatePollRequest.PollName,
+		"MaxNumRankedChoiceCount": updatePollRequest.MaxNumRankedChoiceCount,
+		"CandidateList":           updatePollRequest.CandidateList,
+	}, firestore.MergeAll)
 
-	//TODO: Uncomment the next line to return response Response(404, Messages{}) or use other options such as http.Ok ...
-	//return Response(404, Messages{}), nil
+	// Check for Requests Errors
+	if err != nil {
+		AddMessage(&messages, Severity(ERROR), "Request Body issue", fmt.Sprintf("Poll could not be created: %s", err))
+		poll_model.Messages = messages
+		return Response(http.StatusNotFound, poll_model), err
+	}
 
-	//TODO: Uncomment the next line to return response Response(422, Messages{}) or use other options such as http.Ok ...
-	//return Response(422, Messages{}), nil
+	addPollData, err2 := firestore_client.Collection(collectionName).Doc(pollID).Get(ctx)
 
-	//TODO: Uncomment the next line to return response Response(500, Messages{}) or use other options such as http.Ok ...
-	//return Response(500, Messages{}), nil
+	if err2 != nil {
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollID, err2))
+		poll_model.Messages = messages
+		return Response(http.StatusNotFound, poll_model), err2
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("UpdatePoll method not implemented")
+	err2 = addPollData.DataTo(&poll_model.Data)
+
+	if err2 != nil {
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollID, err2))
+		poll_model.Messages = messages
+		return Response(http.StatusNotAcceptable, poll_model), err2
+	}
+
+	AddMessage(&messages, Severity(INFO), "000000", "Poll Created")
+	poll_model.Messages = messages
+	return Response(http.StatusOK, poll_model), nil
+
 }
