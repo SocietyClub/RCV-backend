@@ -55,7 +55,7 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 		err := errors.New("xUSERID is not valid UUID")
 		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be created: %s", err))
 		addPollResponse.Messages = messages
-		return Response(http.StatusNotFound, addPollResponse), err
+		return Response(http.StatusBadRequest, addPollResponse), err
 	}
 
 	// TODO: Validate Body requests to ensure it meets regex and limit requirements
