@@ -51,6 +51,13 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	uuidWithHyphen := uuid.New()
 	polldoc := firestore_client.Collection(collectionName).Doc(uuidWithHyphen.String())
 
+	if !IsValidUUID(xUSERID) {
+		err := errors.New("xUSERID is not valid UUID")
+		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be created: %s", err))
+		addPollResponse.Messages = messages
+		return Response(http.StatusNotFound, addPollResponse), err
+	}
+
 	// TODO: Validate Body requests to ensure it meets regex and limit requirements
 
 	// Mapping body request
@@ -58,6 +65,7 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 		"PollId":                  polldoc.ID,
 		"PollOpen":                true,
 		"PollName":                createPollRequest.PollName,
+		"CreatorId":               xUSERID,
 		"StartDate":               firestore.ServerTimestamp,
 		"EndDate":                 firestore.ServerTimestamp,
 		"MaxNumRankedChoiceCount": createPollRequest.MaxNumRankedChoiceCount,
@@ -137,6 +145,9 @@ func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID st
 		poll_model.Messages = messages
 		return Response(http.StatusNotAcceptable, poll_model), err
 	}
+
+	poll_model.Data.UserIsCreator = (poll_model.Data.CreatorId == xUSERID)
+	poll_model.Data.CreatorId = ""
 
 	AddMessage(&messages, Severity(INFO), "GetPoll-OK", "Poll successfully retreived")
 	poll_model.Messages = messages

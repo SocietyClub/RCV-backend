@@ -13,5 +13,5 @@ package openapi
 type AddPollResponse struct {
 	Messages Messages `json:"messages,omitempty"`
 
-	Data AddPollData `json:"data,omitempty"`
+	Data PollData `json:"data,omitempty"`
 }

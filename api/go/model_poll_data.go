@@ -16,14 +16,17 @@ import (
 
 // Id for Poll that was created.
 // Poll status on being opened for users.
+// CreatorId for to keep track of authorization.
 // Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
 // End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
 // Name for Poll entered by the user used as information purposes only.
 // Optional description for Poll entered by the user used as information purposes only.
 
-type AddPollData struct {
+type PollData struct {
 	PollId                  string      `json:"pollId" firestore:"pollId,omitempty"`
 	PollOpen                bool        `json:"pollOpen" firestore:"pollOpen,omitempty"`
+	CreatorId               string      `json:"creatorId" firestore:"creatorId,omitempty"`
+	UserIsCreator           bool        `json:"userIsCreator,omitempty"`
 	StartDate               time.Time   `json:"startDate" firestore:"startDate,omitempty"`
 	EndDate                 time.Time   `json:"endDate" firestore:"endDate,omitempty"`
 	PollName                string      `json:"pollName" firestore:"pollName,omitempty"`
