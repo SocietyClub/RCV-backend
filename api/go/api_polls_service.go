@@ -225,6 +225,9 @@ func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID
 		return Response(http.StatusNotAcceptable, poll_model), err2
 	}
 
+	poll_model.Data.UserIsCreator = (poll_model.Data.CreatorId == xUSERID)
+	poll_model.Data.CreatorId = ""
+
 	AddMessage(&messages, Severity(INFO), "000000", "Poll Updated")
 	poll_model.Messages = messages
 	return Response(http.StatusOK, poll_model), nil
