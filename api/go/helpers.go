@@ -10,6 +10,8 @@
 
 package openapi
 
+import "github.com/google/uuid"
+
 //Response return a ImplResponse struct filled
 func Response(code int, body interface{}) ImplResponse {
 	return ImplResponse{
@@ -32,4 +34,9 @@ func AddMessage(messages *Messages, severity Severity, code string, content stri
 		messages.Status = Status(SUCCESSFUL)
 	}
 	messages.MessageList = message // Todo: message list is not a list, yikes.
+}
+
+func IsValidUUID(u string) bool {
+	_, err := uuid.Parse(u)
+	return err == nil
 }
