@@ -192,8 +192,33 @@ func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
 
+	// Closes client after function returns a value
 	defer firestore_client.Close()
 
+	// Get creatorID
+	getCreatorId, err2 := firestore_client.Collection(collectionName).Doc(pollID).Get(ctx)
+
+	if err2 != nil {
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollID, err2))
+		poll_model.Messages = messages
+		return Response(http.StatusNotFound, poll_model), err2
+	}
+
+	err2 = getCreatorId.DataTo(&poll_model.Data)
+
+	if err2 != nil {
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollID, err2))
+		poll_model.Messages = messages
+		return Response(http.StatusNotAcceptable, poll_model), err2
+	}
+
+	// If creator Id is not equal to user id block from updating poll
+	if poll_model.Data.CreatorId != xUSERID {
+		err := errors.New("xUSERID is not valid UUID")
+		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be updated: %s", err))
+		poll_model.Messages = messages
+		return Response(http.StatusBadRequest, poll_model), err
+	}
 	// Mapping body request
 	_, err := firestore_client.Collection(collectionName).Doc(pollID).Set(ctx, map[string]interface{}{
 		"PollOpen":                updatePollRequest.PollOpen,
