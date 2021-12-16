@@ -90,9 +90,9 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	err2 = addPollData.DataTo(&addPollResponse.Data)
 
 	if err2 != nil {
-		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", polldoc.ID, err2))
+		AddMessage(&messages, Severity(ERROR), "Unable to extract Poll data", fmt.Sprintf("Poll Id(%s) could not extracted: %s", polldoc.ID, err2))
 		addPollResponse.Messages = messages
-		return Response(http.StatusNotAcceptable, addPollResponse), err2
+		return Response(http.StatusInternalServerError, addPollResponse), err2
 	}
 
 	AddMessage(&messages, Severity(INFO), "000000", "Poll Created")
@@ -245,9 +245,9 @@ func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID
 	err2 = addPollData.DataTo(&poll_model.Data)
 
 	if err2 != nil {
-		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollID, err2))
+		AddMessage(&messages, Severity(ERROR), "Unable to extract Poll data", fmt.Sprintf("Poll Id(%s) could not extracted: %s", pollID, err2))
 		poll_model.Messages = messages
-		return Response(http.StatusNotAcceptable, poll_model), err2
+		return Response(http.StatusInternalServerError, poll_model), err2
 	}
 
 	poll_model.Data.UserIsCreator = (poll_model.Data.CreatorId == xUSERID)
