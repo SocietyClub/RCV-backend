@@ -41,6 +41,13 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	var messages Messages
 	var addPollResponse AddPollResponse
 
+	if !IsValidUUID(xUSERID) {
+		err := errors.New("xUSERID is not valid UUID")
+		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be created: %s", err))
+		addPollResponse.Messages = messages
+		return Response(http.StatusBadRequest, addPollResponse), err
+	}
+
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
 
@@ -50,13 +57,6 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	// Generate UUID and assign to Firestore document
 	uuidWithHyphen := uuid.New()
 	polldoc := firestore_client.Collection(collectionName).Doc(uuidWithHyphen.String())
-
-	if !IsValidUUID(xUSERID) {
-		err := errors.New("xUSERID is not valid UUID")
-		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be created: %s", err))
-		addPollResponse.Messages = messages
-		return Response(http.StatusBadRequest, addPollResponse), err
-	}
 
 	// TODO: Validate Body requests to ensure it meets regex and limit requirements
 
@@ -76,7 +76,7 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	if err != nil {
 		AddMessage(&messages, Severity(ERROR), "Request Body issue", fmt.Sprintf("Poll could not be created: %s", err))
 		addPollResponse.Messages = messages
-		return Response(http.StatusNotFound, addPollResponse), err
+		return Response(http.StatusBadRequest, addPollResponse), err
 	}
 
 	addPollData, err2 := firestore_client.Collection(collectionName).Doc(polldoc.ID).Get(ctx)
@@ -229,9 +229,9 @@ func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID
 
 	// Check for Requests Errors
 	if err != nil {
-		AddMessage(&messages, Severity(ERROR), "Request Body issue", fmt.Sprintf("Poll could not be created: %s", err))
+		AddMessage(&messages, Severity(ERROR), "Request Body issue", fmt.Sprintf("Poll could not be updated: %s", err))
 		poll_model.Messages = messages
-		return Response(http.StatusNotFound, poll_model), err
+		return Response(http.StatusBadRequest, poll_model), err
 	}
 
 	addPollData, err2 := firestore_client.Collection(collectionName).Doc(pollID).Get(ctx)
