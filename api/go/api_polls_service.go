@@ -125,6 +125,13 @@ func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID st
 	var messages Messages
 	var poll_model GetPollResponse
 
+	if !IsValidUUID(xUSERID) {
+		err := errors.New("xUSERID is not valid UUID")
+		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be retrieved: %s", err))
+		poll_model.Messages = messages
+		return Response(http.StatusBadRequest, poll_model), err
+	}
+
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
 
