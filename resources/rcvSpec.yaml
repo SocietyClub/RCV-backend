@@ -361,16 +361,6 @@ components:
         pollOpen:
           description: Poll status on being opened for users.
           type: boolean
-        startDate:
-          description: Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
-          type: string
-          format: date-time
-          example: '2021-04-21T17:32:28Z'
-        endDate:
-          description: End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
-          type: string
-          format: date-time
-          example: '2021-04-21T17:32:28Z'
         pollName:
           description: Name for Poll entered by the user used as information purposes only.
           type: string
@@ -384,6 +374,16 @@ components:
           minLength: 0
           pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
           type: string
+        startDate:
+          description: Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          type: string
+          format: date-time
+          example: '2021-04-21T17:32:28Z'
+        endDate:
+          description: End date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
+          type: string
+          format: date-time
+          example: '2021-04-21T17:32:28Z'
         maxNumRankedChoiceCount:
           type: integer
           format: int32
@@ -414,6 +414,9 @@ components:
           pattern: '^([a-zA-Z0-9]){0,14}$'
         pollOpen:
           description: Poll status on being opened for users.
+          type: boolean
+        userIsCreator:
+          description: Status on whether user is creator of poll
           type: boolean
         startDate:
           description: Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.

@@ -1,6 +1,6 @@
 {
 	"info": {
-		"_postman_id": "a43fe28a-88ea-4380-be81-707cab00ac77",
+		"_postman_id": "cc571b16-cf8a-449f-81e0-2f9de6186b69",
 		"name": "RCV API Collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
@@ -15,11 +15,16 @@
 						"name": "Content-Type",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "X-USER-ID",
+						"value": "0ea692a9-9e56-4182-8610-e0f9afb768b2",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"id\": \"2\",\n    \"startDate\": \"2021-07-16T00:00:00+07:00\",\n    \"endDate\": \"2021-07-16T00:00:00+08:00\",\n    \"maxNumRankedChoiceCount\": \"42\",\n    \"Candidate\": \"test 2\"\n}",
+					"raw": "{\n  \"pollName\": \"PollTest\",\n  \"maxNumRankedChoiceCount\": 4,\n  \"candidateList\": [\n    {\n      \"name\": \"Spiderman\"\n    },\n {\n      \"name\": \"Batman\"\n    }   \n  ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -27,14 +32,23 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/poll",
+					"raw": "http://localhost:8080/ranked-choice-vote/v1/poll",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
+						"ranked-choice-vote",
+						"v1",
 						"poll"
+					],
+					"query": [
+						{
+							"key": "X-USER-ID",
+							"value": "0ea692a9-9e56-4182-8610-e0f9afb768b2",
+							"disabled": true
+						}
 					]
 				}
 			},
@@ -102,81 +116,7 @@
 			"response": []
 		},
 		{
-			"name": "Get All Poll",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/poll",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"poll"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "Update Poll",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"startDate\": \"2021-07-16T00:00:00+07:00\",\n    \"endDate\": \"2021-07-16T00:00:00+08:00\",\n    \"maxNumRankedChoiceCount\": \"42\",\n    \"Candidate\": \"test 2\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/poll/2",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"poll",
-						"2"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Patch Poll",
 			"request": {
 				"method": "PATCH",
 				"header": [
@@ -185,11 +125,16 @@
 						"name": "Content-Type",
 						"type": "text",
 						"value": "application/json"
+					},
+					{
+						"key": "X-USER-ID",
+						"value": "0ea692a9-9e56-4182-8610-e0f9afb768b3",
+						"type": "text"
 					}
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"candidate\": \"updated 2\"\n}",
+					"raw": "{\n  \"pollName\": \"ASDFTHEMOVIE\",\n  \"pollOpen\": false,\n  \"maxNumRankedChoiceCount\": 3,\n  \"candidateList\": [\n    {\n      \"name\": \"Spiderman\"\n    },\n {\n      \"name\": \"Batman\"\n    }   \n  ]\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -197,15 +142,17 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/poll/2",
+					"raw": "http://localhost:8080/ranked-choice-vote/v1/poll/d8b89827-e359-436f-ab03-e6bdcc8d6581",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
+						"ranked-choice-vote",
+						"v1",
 						"poll",
-						"2"
+						"d8b89827-e359-436f-ab03-e6bdcc8d6581"
 					]
 				}
 			},
@@ -233,53 +180,17 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:8080/poll/{1}",
+					"raw": "http://localhost:8080/ranked-choice-vote/v1/poll/0b764989-a111-4c8e-af16-42b7c7e8285c",
 					"protocol": "http",
 					"host": [
 						"localhost"
 					],
 					"port": "8080",
 					"path": [
+						"ranked-choice-vote",
+						"v1",
 						"poll",
-						"{1}"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Health Check",
-			"protocolProfileBehavior": {
-				"disableBodyPruning": true
-			},
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/health",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"health"
+						"0b764989-a111-4c8e-af16-42b7c7e8285c"
 					]
 				}
 			},

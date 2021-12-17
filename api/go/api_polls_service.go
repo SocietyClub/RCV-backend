@@ -41,6 +41,13 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	var messages Messages
 	var addPollResponse AddPollResponse
 
+	if !IsValidUUID(xUSERID) {
+		err := errors.New("xUSERID is not valid UUID")
+		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be created: %s", err))
+		addPollResponse.Messages = messages
+		return Response(http.StatusBadRequest, addPollResponse), err
+	}
+
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
 
@@ -50,13 +57,6 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	// Generate UUID and assign to Firestore document
 	uuidWithHyphen := uuid.New()
 	polldoc := firestore_client.Collection(collectionName).Doc(uuidWithHyphen.String())
-
-	if !IsValidUUID(xUSERID) {
-		err := errors.New("xUSERID is not valid UUID")
-		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be created: %s", err))
-		addPollResponse.Messages = messages
-		return Response(http.StatusBadRequest, addPollResponse), err
-	}
 
 	// TODO: Validate Body requests to ensure it meets regex and limit requirements
 
@@ -76,7 +76,7 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	if err != nil {
 		AddMessage(&messages, Severity(ERROR), "Request Body issue", fmt.Sprintf("Poll could not be created: %s", err))
 		addPollResponse.Messages = messages
-		return Response(http.StatusNotFound, addPollResponse), err
+		return Response(http.StatusBadRequest, addPollResponse), err
 	}
 
 	addPollData, err2 := firestore_client.Collection(collectionName).Doc(polldoc.ID).Get(ctx)
@@ -90,9 +90,9 @@ func (s *PollsApiService) CreatePoll(ctx context.Context, xUSERID string, create
 	err2 = addPollData.DataTo(&addPollResponse.Data)
 
 	if err2 != nil {
-		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", polldoc.ID, err2))
+		AddMessage(&messages, Severity(ERROR), "Unable to extract Poll data", fmt.Sprintf("Poll Id(%s) could not extracted: %s", polldoc.ID, err2))
 		addPollResponse.Messages = messages
-		return Response(http.StatusNotAcceptable, addPollResponse), err2
+		return Response(http.StatusInternalServerError, addPollResponse), err2
 	}
 
 	AddMessage(&messages, Severity(INFO), "000000", "Poll Created")
@@ -124,6 +124,13 @@ func (s *PollsApiService) DeletePoll(ctx context.Context, xUSERID string, pollID
 func (s *PollsApiService) GetPoll(ctx context.Context, xUSERID string, pollID string) (ImplResponse, error) {
 	var messages Messages
 	var poll_model GetPollResponse
+
+	if !IsValidUUID(xUSERID) {
+		err := errors.New("xUSERID is not valid UUID")
+		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be retrieved: %s", err))
+		poll_model.Messages = messages
+		return Response(http.StatusBadRequest, poll_model), err
+	}
 
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
@@ -185,29 +192,76 @@ func (s *PollsApiService) GetPollResults(ctx context.Context, xUSERID string, po
 
 // UpdatePoll - Updates an existing Poll
 func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID string, updatePollRequest UpdatePollRequest) (ImplResponse, error) {
-	// TODO - update UpdatePoll with the required logic for this service method.
-	// Add api_polls_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
 
-	//TODO: Uncomment the next line to return response Response(200, GetPollResponse{}) or use other options such as http.Ok ...
-	//return Response(200, GetPollResponse{}), nil
+	var messages Messages
+	var poll_model GetPollResponse
 
-	//TODO: Uncomment the next line to return response Response(400, Messages{}) or use other options such as http.Ok ...
-	//return Response(400, Messages{}), nil
+	context_background := context.Background()
+	firestore_client := GetFirestoreClient(context_background)
 
-	//TODO: Uncomment the next line to return response Response(401, Messages{}) or use other options such as http.Ok ...
-	//return Response(401, Messages{}), nil
+	// Closes client after function returns a value
+	defer firestore_client.Close()
 
-	//TODO: Uncomment the next line to return response Response(403, Messages{}) or use other options such as http.Ok ...
-	//return Response(403, Messages{}), nil
+	// Get creatorID
+	getCreatorId, err2 := firestore_client.Collection(collectionName).Doc(pollID).Get(ctx)
 
-	//TODO: Uncomment the next line to return response Response(404, Messages{}) or use other options such as http.Ok ...
-	//return Response(404, Messages{}), nil
+	if err2 != nil {
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollID, err2))
+		poll_model.Messages = messages
+		return Response(http.StatusNotFound, poll_model), err2
+	}
 
-	//TODO: Uncomment the next line to return response Response(422, Messages{}) or use other options such as http.Ok ...
-	//return Response(422, Messages{}), nil
+	err2 = getCreatorId.DataTo(&poll_model.Data)
 
-	//TODO: Uncomment the next line to return response Response(500, Messages{}) or use other options such as http.Ok ...
-	//return Response(500, Messages{}), nil
+	if err2 != nil {
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollID, err2))
+		poll_model.Messages = messages
+		return Response(http.StatusNotAcceptable, poll_model), err2
+	}
 
-	return Response(http.StatusNotImplemented, nil), errors.New("UpdatePoll method not implemented")
+	// If creator Id is not equal to user id block from updating poll
+	if poll_model.Data.CreatorId != xUSERID {
+		err := errors.New("xUSERID is not the Creator ID of this Poll")
+		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Poll could not be updated: %s", err))
+		poll_model.Messages = messages
+		return Response(http.StatusUnauthorized, poll_model), err
+	}
+	// Mapping body request
+	_, err := firestore_client.Collection(collectionName).Doc(pollID).Set(ctx, map[string]interface{}{
+		"PollOpen":                updatePollRequest.PollOpen,
+		"PollName":                updatePollRequest.PollName,
+		"MaxNumRankedChoiceCount": updatePollRequest.MaxNumRankedChoiceCount,
+		"CandidateList":           updatePollRequest.CandidateList,
+	}, firestore.MergeAll)
+
+	// Check for Requests Errors
+	if err != nil {
+		AddMessage(&messages, Severity(ERROR), "Request Body issue", fmt.Sprintf("Poll could not be updated: %s", err))
+		poll_model.Messages = messages
+		return Response(http.StatusBadRequest, poll_model), err
+	}
+
+	addPollData, err2 := firestore_client.Collection(collectionName).Doc(pollID).Get(ctx)
+
+	if err2 != nil {
+		AddMessage(&messages, Severity(ERROR), "Unable to get Poll Id", fmt.Sprintf("Poll Id(%s) could not retrieved: %s", pollID, err2))
+		poll_model.Messages = messages
+		return Response(http.StatusNotFound, poll_model), err2
+	}
+
+	err2 = addPollData.DataTo(&poll_model.Data)
+
+	if err2 != nil {
+		AddMessage(&messages, Severity(ERROR), "Unable to extract Poll data", fmt.Sprintf("Poll Id(%s) could not extracted: %s", pollID, err2))
+		poll_model.Messages = messages
+		return Response(http.StatusInternalServerError, poll_model), err2
+	}
+
+	poll_model.Data.UserIsCreator = (poll_model.Data.CreatorId == xUSERID)
+	poll_model.Data.CreatorId = ""
+
+	AddMessage(&messages, Severity(INFO), "000000", "Poll Updated")
+	poll_model.Messages = messages
+	return Response(http.StatusOK, poll_model), nil
+
 }
