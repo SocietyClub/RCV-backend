@@ -367,6 +367,13 @@ components:
           minLength: 0
           maxLength: 30
           pattern: '^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$'
+        pollDesc:
+          description: Optional description for Poll entered by the user used as information
+            purposes only.
+          maxLength: 500
+          minLength: 0
+          pattern: ^[a-zA-Z0-9 &quot;&apos;&amp;!#$%()*+,-./:;?@[\\]^_`{|}~]{0,30}$
+          type: string
         startDate:
           description: Start date and time for poll to be open. Generated as ISO-0601 that format should be 'yyyy-mm-ddTHH:mm:ss.SSSZ'.
           type: string
