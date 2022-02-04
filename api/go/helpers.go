@@ -33,7 +33,7 @@ func AddMessage(messages *Messages, severity Severity, code string, content stri
 	} else {
 		messages.Status = Status(SUCCESSFUL)
 	}
-	messages.MessageList = message // Todo: message list is not a list, yikes.
+	messages.MessageList = append(messages.MessageList, message)
 }
 
 func IsValidUUID(u string) bool {

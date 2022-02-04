@@ -59,6 +59,7 @@ go get
 3. Run the following commands
 
 ```shell
+$env:GOOGLE_APPLICATION_CREDENTIALS="../firestore_prod_key.json" # or where your key is stored at...
 cd RCV-backend/api
 go run main.go
 ```

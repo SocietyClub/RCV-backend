@@ -15,43 +15,40 @@ import (
 	"net/http"
 )
 
-
-
 // PollsApiRouter defines the required methods for binding the api requests to a responses for the PollsApi
-// The PollsApiRouter implementation should parse necessary information from the http request, 
+// The PollsApiRouter implementation should parse necessary information from the http request,
 // pass the data to a PollsApiServicer to perform the required actions, then write the service results to the http response.
-type PollsApiRouter interface { 
+type PollsApiRouter interface {
 	CreatePoll(http.ResponseWriter, *http.Request)
 	DeletePoll(http.ResponseWriter, *http.Request)
 	GetPoll(http.ResponseWriter, *http.Request)
 	GetPollResults(http.ResponseWriter, *http.Request)
 	UpdatePoll(http.ResponseWriter, *http.Request)
 }
+
 // VotesApiRouter defines the required methods for binding the api requests to a responses for the VotesApi
-// The VotesApiRouter implementation should parse necessary information from the http request, 
+// The VotesApiRouter implementation should parse necessary information from the http request,
 // pass the data to a VotesApiServicer to perform the required actions, then write the service results to the http response.
-type VotesApiRouter interface { 
+type VotesApiRouter interface {
 	PollPollIDVotePost(http.ResponseWriter, *http.Request)
 }
 
-
 // PollsApiServicer defines the api actions for the PollsApi service
-// This interface intended to stay up to date with the openapi yaml used to generate it, 
-// while the service implementation can ignored with the .openapi-generator-ignore file 
+// This interface intended to stay up to date with the openapi yaml used to generate it,
+// while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
-type PollsApiServicer interface { 
-	CreatePoll(context.Context, string, CreatePollRequest) (ImplResponse, error)
-	DeletePoll(context.Context, string, string) (ImplResponse, error)
-	GetPoll(context.Context, string, string) (ImplResponse, error)
-	GetPollResults(context.Context, string, string) (ImplResponse, error)
-	UpdatePoll(context.Context, string, string, UpdatePollRequest) (ImplResponse, error)
+type PollsApiServicer interface {
+	CreatePoll(context.Context, string, CreatePollRequest) ImplResponse
+	DeletePoll(context.Context, string, string) ImplResponse
+	GetPoll(context.Context, string, string) ImplResponse
+	GetPollResults(context.Context, string, string) ImplResponse
+	UpdatePoll(context.Context, string, string, UpdatePollRequest) ImplResponse
 }
 
-
 // VotesApiServicer defines the api actions for the VotesApi service
-// This interface intended to stay up to date with the openapi yaml used to generate it, 
-// while the service implementation can ignored with the .openapi-generator-ignore file 
+// This interface intended to stay up to date with the openapi yaml used to generate it,
+// while the service implementation can ignored with the .openapi-generator-ignore file
 // and updated with the logic required for the API.
-type VotesApiServicer interface { 
-	PollPollIDVotePost(context.Context, string, string, VoteInput) (ImplResponse, error)
+type VotesApiServicer interface {
+	PollPollIDVotePost(context.Context, string, string, VoteInput) ImplResponse
 }

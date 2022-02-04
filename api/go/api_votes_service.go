@@ -12,12 +12,15 @@ package openapi
 
 import (
 	"context"
-	"net/http"
 	"errors"
+	"fmt"
+	"net/http"
+
+	"cloud.google.com/go/firestore"
 )
 
 // VotesApiService is a service that implents the logic for the VotesApiServicer
-// This service should implement the business logic for every endpoint for the VotesApi API. 
+// This service should implement the business logic for every endpoint for the VotesApi API.
 // Include any external packages or services that will be required by this service.
 type VotesApiService struct {
 }
@@ -27,32 +30,43 @@ func NewVotesApiService() VotesApiServicer {
 	return &VotesApiService{}
 }
 
+const (
+	votesCollectionName string = "votes"
+)
+
 // PollPollIDVotePost - Cast a vote for a specific Poll
-func (s *VotesApiService) PollPollIDVotePost(ctx context.Context, xUSERID string, pollID string, voteInput VoteInput) (ImplResponse, error) {
-	// TODO - update PollPollIDVotePost with the required logic for this service method.
-	// Add api_votes_service.go to the .openapi-generator-ignore to avoid overwriting this service implementation when updating open api generation.
+func (s *VotesApiService) PollPollIDVotePost(ctx context.Context, xUSERID string, pollID string, voteInput VoteInput) ImplResponse {
+	var messages Messages
+	var addVoteResponse AddVoteResponse
 
-	//TODO: Uncomment the next line to return response Response(200, GetPollResponse{}) or use other options such as http.Ok ...
-	//return Response(200, GetPollResponse{}), nil
+	if !IsValidUUID(xUSERID) {
+		err := errors.New("xUSERID is not valid UUID")
+		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Vote could not be posted: %s", err))
+		addVoteResponse.Messages = messages
+		return Response(http.StatusBadRequest, addVoteResponse)
+	}
 
-	//TODO: Uncomment the next line to return response Response(400, Messages{}) or use other options such as http.Ok ...
-	//return Response(400, Messages{}), nil
+	context_background := context.Background()
+	firestore_client := GetFirestoreClient(context_background)
 
-	//TODO: Uncomment the next line to return response Response(401, Messages{}) or use other options such as http.Ok ...
-	//return Response(401, Messages{}), nil
+	// Closes client after function returns a value.
+	defer firestore_client.Close()
 
-	//TODO: Uncomment the next line to return response Response(403, Messages{}) or use other options such as http.Ok ...
-	//return Response(403, Messages{}), nil
+	votedoc := firestore_client.Collection(votesCollectionName).Doc(pollID)
+	// TODO: add checks to ensure the vote and or poll is valid.
 
-	//TODO: Uncomment the next line to return response Response(404, Messages{}) or use other options such as http.Ok ...
-	//return Response(404, Messages{}), nil
+	err := firestore_client.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
+		return tx.Set(votedoc, map[string]interface{}{
+			xUSERID: voteInput.Choices,
+		}, firestore.MergeAll)
+	})
 
-	//TODO: Uncomment the next line to return response Response(422, Messages{}) or use other options such as http.Ok ...
-	//return Response(422, Messages{}), nil
+	if err != nil {
+		AddMessage(&messages, Severity(ERROR), "Database transaction failure", fmt.Sprintf("Vote could not be posted: %s", err))
+		addVoteResponse.Messages = messages
+		return Response(http.StatusInternalServerError, addVoteResponse)
+	}
 
-	//TODO: Uncomment the next line to return response Response(500, Messages{}) or use other options such as http.Ok ...
-	//return Response(500, Messages{}), nil
+	return Response(http.StatusOK, nil)
 
-	return Response(http.StatusNotImplemented, nil), errors.New("PollPollIDVotePost method not implemented")
 }
-
