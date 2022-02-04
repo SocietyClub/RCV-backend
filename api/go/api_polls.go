@@ -30,7 +30,7 @@ func NewPollsApiController(s PollsApiServicer) Router {
 
 // Routes returns all of the api route for the PollsApiController
 func (c *PollsApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"CreatePoll",
 			strings.ToUpper("Post"),
@@ -64,7 +64,6 @@ func (c *PollsApiController) Routes() Routes {
 	}
 }
 
-
 // CreatePoll - Creates a new Poll
 func (c *PollsApiController) CreatePoll(w http.ResponseWriter, r *http.Request) {
 	xUSERID := r.Header.Get("X-USER-ID")
@@ -73,12 +72,8 @@ func (c *PollsApiController) CreatePoll(w http.ResponseWriter, r *http.Request) 
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	result, err := c.service.CreatePoll(r.Context(), xUSERID, *createPollRequest)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		EncodeJSONResponse(err.Error(), &result.Code, w)
-		return
-	}
+	result := c.service.CreatePoll(r.Context(), xUSERID, *createPollRequest)
+
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 
@@ -89,13 +84,9 @@ func (c *PollsApiController) DeletePoll(w http.ResponseWriter, r *http.Request) 
 	params := mux.Vars(r)
 	xUSERID := r.Header.Get("X-USER-ID")
 	pollID := params["PollID"]
-	
-	result, err := c.service.DeletePoll(r.Context(), xUSERID, pollID)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		EncodeJSONResponse(err.Error(), &result.Code, w)
-		return
-	}
+
+	result := c.service.DeletePoll(r.Context(), xUSERID, pollID)
+
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 
@@ -106,13 +97,9 @@ func (c *PollsApiController) GetPoll(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	xUSERID := r.Header.Get("X-USER-ID")
 	pollID := params["PollID"]
-	
-	result, err := c.service.GetPoll(r.Context(), xUSERID, pollID)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		EncodeJSONResponse(err.Error(), &result.Code, w)
-		return
-	}
+
+	result := c.service.GetPoll(r.Context(), xUSERID, pollID)
+
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 
@@ -123,13 +110,9 @@ func (c *PollsApiController) GetPollResults(w http.ResponseWriter, r *http.Reque
 	params := mux.Vars(r)
 	xUSERID := r.Header.Get("X-USER-ID")
 	pollID := params["PollID"]
-	
-	result, err := c.service.GetPollResults(r.Context(), xUSERID, pollID)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		EncodeJSONResponse(err.Error(), &result.Code, w)
-		return
-	}
+
+	result := c.service.GetPollResults(r.Context(), xUSERID, pollID)
+
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 
@@ -140,18 +123,14 @@ func (c *PollsApiController) UpdatePoll(w http.ResponseWriter, r *http.Request) 
 	params := mux.Vars(r)
 	xUSERID := r.Header.Get("X-USER-ID")
 	pollID := params["PollID"]
-	
+
 	updatePollRequest := &UpdatePollRequest{}
 	if err := json.NewDecoder(r.Body).Decode(&updatePollRequest); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	result, err := c.service.UpdatePoll(r.Context(), xUSERID, pollID, *updatePollRequest)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		EncodeJSONResponse(err.Error(), &result.Code, w)
-		return
-	}
+	result := c.service.UpdatePoll(r.Context(), xUSERID, pollID, *updatePollRequest)
+
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 

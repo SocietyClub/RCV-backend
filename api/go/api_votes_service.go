@@ -35,25 +35,25 @@ const (
 )
 
 // PollPollIDVotePost - Cast a vote for a specific Poll
-func (s *VotesApiService) PollPollIDVotePost(ctx context.Context, xUSERID string, pollID string, voteInput VoteInput) (ImplResponse, error) {
+func (s *VotesApiService) PollPollIDVotePost(ctx context.Context, xUSERID string, pollID string, voteInput VoteInput) ImplResponse {
 	var messages Messages
-	var addPollResponse AddPollResponse
+	var addVoteResponse AddVoteResponse
 
 	if !IsValidUUID(xUSERID) {
 		err := errors.New("xUSERID is not valid UUID")
 		AddMessage(&messages, Severity(ERROR), "Request Param issue", fmt.Sprintf("Vote could not be posted: %s", err))
-		addPollResponse.Messages = messages
-		return Response(http.StatusBadRequest, addPollResponse), err
+		addVoteResponse.Messages = messages
+		return Response(http.StatusBadRequest, addVoteResponse)
 	}
 
 	context_background := context.Background()
 	firestore_client := GetFirestoreClient(context_background)
 
-	// Closes client after function returns a value
+	// Closes client after function returns a value.
 	defer firestore_client.Close()
 
 	votedoc := firestore_client.Collection(votesCollectionName).Doc(pollID)
-	// TODO: add checks to ensure the vote is valid.
+	// TODO: add checks to ensure the vote and or poll is valid.
 
 	err := firestore_client.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
 		return tx.Set(votedoc, map[string]interface{}{
@@ -63,10 +63,10 @@ func (s *VotesApiService) PollPollIDVotePost(ctx context.Context, xUSERID string
 
 	if err != nil {
 		AddMessage(&messages, Severity(ERROR), "Database transaction failure", fmt.Sprintf("Vote could not be posted: %s", err))
-		addPollResponse.Messages = messages
-		return Response(http.StatusInternalServerError, addPollResponse), err
+		addVoteResponse.Messages = messages
+		return Response(http.StatusInternalServerError, addVoteResponse)
 	}
 
-	return Response(http.StatusOK, voteInput), nil
+	return Response(http.StatusOK, nil)
 
 }

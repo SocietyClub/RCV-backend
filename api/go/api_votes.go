@@ -30,7 +30,7 @@ func NewVotesApiController(s VotesApiServicer) Router {
 
 // Routes returns all of the api route for the VotesApiController
 func (c *VotesApiController) Routes() Routes {
-	return Routes{ 
+	return Routes{
 		{
 			"PollPollIDVotePost",
 			strings.ToUpper("Post"),
@@ -45,18 +45,14 @@ func (c *VotesApiController) PollPollIDVotePost(w http.ResponseWriter, r *http.R
 	params := mux.Vars(r)
 	xUSERID := r.Header.Get("X-USER-ID")
 	pollID := params["PollID"]
-	
+
 	voteInput := &VoteInput{}
 	if err := json.NewDecoder(r.Body).Decode(&voteInput); err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
-	result, err := c.service.PollPollIDVotePost(r.Context(), xUSERID, pollID, *voteInput)
-	// If an error occurred, encode the error with the status code
-	if err != nil {
-		EncodeJSONResponse(err.Error(), &result.Code, w)
-		return
-	}
+	result := c.service.PollPollIDVotePost(r.Context(), xUSERID, pollID, *voteInput)
+
 	// If no error, encode the body and the result code
 	EncodeJSONResponse(result.Body, &result.Code, w)
 
