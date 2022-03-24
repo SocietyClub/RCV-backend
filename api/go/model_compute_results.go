@@ -10,13 +10,18 @@
 
 package openapi
 
+import (
+	"fmt"
+	"math"
+)
+
 type PollComputeVote struct {
 	candidateChoices []string
 }
 
 type PollComputeCandidate struct {
 	candidate    Candidate
-	eliminated   bool
+	Eliminated   bool
 	currentVotes []PollComputeVote
 }
 
@@ -69,26 +74,48 @@ func processPollStepsImpl(candidates []Candidate, votes []PollComputeVote) PollR
 		candidateMap[candidate.Name] = PollComputeCandidate{candidate, false, make([]PollComputeVote, 0)}
 	}
 
-	for !isPollDone(candidateMap) {
+	for true {
 		candidateMap = iteratePoll(candidateMap, votes)
 		pollStep := createPollResultStep(candidateMap)
+		fmt.Printf("%d", pollStep.StepId)
 
-		// Eliminate candidates
-		// Sort PollVoteDistributionDataPoint s
+		if isPollDone(candidateMap) {
+			break
+		}
+
+		candidateMap = eliminateCandidates(candidateMap)
+
 		// refresh candidateMap for the next iteration
+		for name, candidate := range candidateMap {
+			candidate.currentVotes = make([]PollComputeVote, 0)
+			candidateMap[name] = candidate
+		}
+
+		// Sort PollVoteDistributionDataPoint s
 	}
 
 	return PollResults{}
 }
 
 func isPollDone(candidateMap map[string]PollComputeCandidate) bool {
-	return true
+	totalVotes := 0
+	for _, candidate := range candidateMap {
+		totalVotes += len(candidate.currentVotes)
+	}
+
+	for _, candidate := range candidateMap {
+		if len(candidate.currentVotes) >= totalVotes/2.0 {
+			return true
+		}
+	}
+
+	return false
 }
 
 func iteratePoll(candidateMap map[string]PollComputeCandidate, votes []PollComputeVote) map[string]PollComputeCandidate {
 	for _, vote := range votes {
 		for _, choice := range vote.candidateChoices {
-			if !candidateMap[choice].eliminated {
+			if !candidateMap[choice].Eliminated {
 				computeCandidate := candidateMap[choice]
 				computeCandidate.currentVotes = append(computeCandidate.currentVotes, vote)
 				candidateMap[choice] = computeCandidate
@@ -121,4 +148,22 @@ func getVoteDistribution(votes []PollComputeVote) []PollVoteDistributionDataPoin
 func createPollResultStep(candidateMap map[string]PollComputeCandidate) PollResultStep {
 
 	return PollResultStep{}
+}
+
+func eliminateCandidates(candidateMap map[string]PollComputeCandidate) map[string]PollComputeCandidate {
+	minVoteCount := math.MaxInt64
+	for _, candidate := range candidateMap {
+		if minVoteCount > len(candidate.currentVotes) {
+			minVoteCount = len(candidate.currentVotes)
+		}
+	}
+
+	for name, candidate := range candidateMap {
+		if len(candidate.currentVotes) == minVoteCount {
+			candidate.Eliminated = true
+			candidateMap[name] = candidate
+		}
+	}
+
+	return candidateMap
 }
