@@ -241,6 +241,15 @@ func (s *PollsApiService) UpdatePoll(ctx context.Context, xUSERID string, pollID
 		return Response(http.StatusBadRequest, poll_model)
 	}
 
+	// After the update is successful, delete all of the votes
+	_, deleteErr := firestore_client.Collection(votesCollectionName).Doc(pollID).Delete(ctx)
+
+	if deleteErr != nil {
+		AddMessage(&messages, Severity(ERROR), "Request Body issue", fmt.Sprintf("Poll votes could not be deleted but the Update was successful: %s", err))
+		poll_model.Messages = messages
+		return Response(http.StatusBadRequest, poll_model)
+	}
+
 	addPollData, err2 := firestore_client.Collection(collectionName).Doc(pollID).Get(ctx)
 
 	if err2 != nil {
