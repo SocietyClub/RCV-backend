@@ -1,3 +1,7 @@
+# Backend was replaced by NEXT api endpoints
+
+See: https://github.com/SocietyClub/RCV
+
 # Rank Choice Voting Backend API
 
 ## Table of Contents
